@@ -1,0 +1,84 @@
+
+<main class="max-w-6xl mx-auto bg-[#eff6ff] min-h-screen relative shadow-2xl overflow-hidden flex flex-col">
+  <!-- Content Area -->
+  <div class="flex-1 overflow-y-auto p-4 md:p-6 scroll-smooth pb-28 w-full mx-auto max-w-5xl">
+    @switch (store.activeTab()) {
+      @case('home') { <app-home /> }
+      @case('shop') { <app-rewards /> }
+      @case('profile') { <app-profile /> }
+      @case('stats') { <app-stats /> }
+      @case('moments') { <app-moments /> }
+    }
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
+    <nav class="bg-white/95 backdrop-blur-md border-t border-indigo-50 px-2 pb-safe pt-2 shadow-[0_-8px_20px_-5px_rgba(0,0,0,0.1)] rounded-t-3xl w-full max-w-6xl pointer-events-auto">
+      <div class="grid grid-cols-5 h-16 items-end relative max-w-lg mx-auto">
+        
+        <!-- 1. Home -->
+        <button (click)="setTab('home')" class="group flex flex-col items-center justify-end pb-2 h-full space-y-1 active:scale-90 transition-transform">
+          <div class="relative">
+             <svg class="w-7 h-7 transition-colors duration-300" [class.text-indigo-600]="store.activeTab() === 'home'" [class.text-gray-300]="store.activeTab() !== 'home'" viewBox="0 0 24 24" fill="currentColor">
+               <path d="M12 2.1a1 1 0 00-1 0L3.3 6.6a1 1 0 00-.5.9v10.1a3 3 0 003 3h12.4a3 3 0 003-3V7.5a1 1 0 00-.5-.9L12 2.1zM11 18v-4a1 1 0 011-1h0a1 1 0 011 1v4h-2z" class="opacity-90"/>
+             </svg>
+          </div>
+          <span class="text-[10px] font-bold transition-colors" [class.text-indigo-600]="store.activeTab() === 'home'" [class.text-gray-400]="store.activeTab() !== 'home'">首页</span>
+        </button>
+
+        <!-- 2. Shop -->
+        <button (click)="setTab('shop')" class="group flex flex-col items-center justify-end pb-2 h-full space-y-1 active:scale-90 transition-transform">
+          <div class="relative">
+             <svg class="w-7 h-7 transition-colors duration-300" [class.text-pink-600]="store.activeTab() === 'shop'" [class.text-gray-300]="store.activeTab() !== 'shop'" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l2.5 3h-5L12 2z"/>
+                <path d="M11 6h2v14h-2V6z" opacity="0.3"/>
+                <path d="M5 6a2 2 0 012-2h10a2 2 0 012 2v2a1 1 0 01-1 1H6a1 1 0 01-1-1V6z"/>
+                <path d="M5 10a1 1 0 00-1 1v7a2 2 0 002 2h12a2 2 0 002-2v-7a1 1 0 00-1-1H5z"/>
+             </svg>
+          </div>
+          <span class="text-[10px] font-bold transition-colors" [class.text-pink-600]="store.activeTab() === 'shop'" [class.text-gray-400]="store.activeTab() !== 'shop'">梦想屋</span>
+        </button>
+
+        <!-- 3. Stats -->
+        <button (click)="setTab('stats')" class="group flex flex-col items-center justify-end pb-2 h-full space-y-1 active:scale-90 transition-transform">
+          <div class="relative">
+             <svg class="w-7 h-7 transition-colors duration-300" [class.text-indigo-500]="store.activeTab() === 'stats'" [class.text-gray-300]="store.activeTab() !== 'stats'" viewBox="0 0 24 24" fill="currentColor">
+               <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" opacity="0.5"/>
+               <path d="M5 3v18h18v-2H7V3H5z"/> 
+               <path d="M0 0h24v24H0z" fill="none"/>
+               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+             </svg>
+          </div>
+          <span class="text-[10px] font-bold transition-colors" [class.text-indigo-500]="store.activeTab() === 'stats'" [class.text-gray-400]="store.activeTab() !== 'stats'">统计</span>
+        </button>
+
+        <!-- 4. Moments -->
+        <button (click)="setTab('moments')" class="group flex flex-col items-center justify-end pb-2 h-full space-y-1 active:scale-90 transition-transform">
+          <div class="relative">
+             <svg class="w-7 h-7 transition-colors duration-300" [class.text-purple-500]="store.activeTab() === 'moments'" [class.text-gray-300]="store.activeTab() !== 'moments'" viewBox="0 0 24 24" fill="currentColor">
+               <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+             </svg>
+          </div>
+          <span class="text-[10px] font-bold transition-colors" [class.text-purple-500]="store.activeTab() === 'moments'" [class.text-gray-400]="store.activeTab() !== 'moments'">美好</span>
+        </button>
+
+        <!-- 5. Profile -->
+        <button (click)="setTab('profile')" class="group flex flex-col items-center justify-end pb-2 h-full space-y-1 active:scale-90 transition-transform">
+          <div class="relative">
+             <svg class="w-7 h-7 transition-colors duration-300" [class.text-indigo-600]="store.activeTab() === 'profile'" [class.text-gray-300]="store.activeTab() !== 'profile'" viewBox="0 0 24 24" fill="currentColor">
+               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+             </svg>
+          </div>
+          <span class="text-[10px] font-bold transition-colors" [class.text-indigo-600]="store.activeTab() === 'profile'" [class.text-gray-400]="store.activeTab() !== 'profile'">我的</span>
+        </button>
+
+      </div>
+    </nav>
+  </div>
+  
+  <style>
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+  </style>
+</main>

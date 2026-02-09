@@ -1,0 +1,33 @@
+
+{
+  "miniprogramRoot": "dist/",
+  "projectname": "sticker-go-taro",
+  "description": "磁贴大挑战",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "enhance": false,
+    "postcss": false,
+    "preloadBackgroundData": false,
+    "minified": true,
+    "newFeature": true,
+    "coverView": true,
+    "nodeModules": false,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true,
+    "scopeDataCheck": false,
+    "uglifyFileName": false,
+    "checkInvalidSitemap": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "latest",
+  "srcMiniprogramRoot": "dist/",
+  "packOptions": {
+    "ignore": []
+  },
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
+}
