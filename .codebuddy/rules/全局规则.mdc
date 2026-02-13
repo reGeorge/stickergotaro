@@ -1,0 +1,71 @@
+---
+description: 
+alwaysApply: true
+enabled: true
+updatedAt: 2026-02-13T09:18:09.057Z
+provider: 
+---
+
+# 磁贴大挑战：项目级工程准则 (PROJECT_RULES.md)
+
+## 🎯 核心原则
+
+* **视觉 1:1 还原**：严禁商务扁平化，必须保持 Web 版蓝紫渐变、玻璃拟态和童趣感。
+* **逻辑高度解耦**：Store 负责状态，Component 负责交互，Service 负责副作用（音效/震动）。
+* **儿童友好**：所有交互必须有即时反馈（视觉动画+物理震动+语义文案）。
+
+---
+
+## 🎨 1. 样式与视觉规范 (Tailwind CSS)
+
+* **技术要求**：必须通过 `weapp-tailwindcss` 编写，严禁原生 `WXSS`。
+* **容器标准**：
+* 基础卡片：`bg-card backdrop-blur-md rounded-3xl border border-white/20 shadow-glass`
+* 核心余额：`bg-gradient-to-br from-brand-primary via-brand-secondary to-brand-accent`
+
+
+* **度量单位**：严禁使用 `px`，必须使用 Tailwind 比例（如 `p-4`）或 `rpx`。
+* **交互动效**：所有可点击元素必须包含 `active:scale-95 transition-all duration-200`。
+* **安全适配**：底部页面强制添加 `pb-[env(safe-area-inset-bottom)]`。
+
+## 🧠 2. 状态管理规范 (Zustand)
+
+* **响应式方案**：禁止使用 Context，必须使用 Zustand。
+* **持久化逻辑**：所有 Store 必须集成 `persist` 中间件，并映射至 `Taro.getStorageSync`。
+* **跨天重置**：`app.tsx` 的 `onShow` 必须调用 `checkDailyReset`。逻辑：若 `lastCheckInDate !== today`，重置 5 大约定场景状态为 `false`。
+* **原子更新**：禁止替换整个状态对象，必须使用 `set((state) => ({ ... }))` 进行路径更新。
+
+## 🛠️ 3. 组件编写准则 (Structure)
+
+AI 生成代码时必须遵循以下顺序：
+
+1. **Types**: 引用 `src/types` 中的严格接口定义。
+2. **Stores**: 使用 `useTaskStore` 或 `useUserStore` 获取响应式数据。
+3. **UI**: 使用 Taro 原生组件（`View`, `Text`, `Image`），严禁 HTML 标签。
+4. **Feedback**: 成功动作后必须显式调用 `VibrateService` 和 `SoundService`。
+
+## 🔒 4. 家长管控与安全性
+
+* **Math-Gate 拦截**：以下操作必须前置弹出数字计算题验证：
+* `src/pages/task-manage/*`（任务编辑）
+* `src/pages/reward-manage/*`（奖项自定义）
+* 磁贴手动增减、奖项重置。
+
+
+* **防误触**：扣除磁贴动作必须配合 `Taro.showModal` 进行二次确认。
+
+## 📝 5. 文案与语义化 (新增)
+
+* **童趣化转换**：禁止使用“任务已保存”、“操作失败”等文案。
+* `save` -> `约定已生效！`
+* `complete` -> `太棒了，完成挑战！`
+* `error` -> `哎呀，小怪兽捣乱了，再试一次？`
+
+
+* **占位符**：空状态展示需配合“美好时刻”或“梦想屋”的童话感配图。
+
+## 🚫 6. 禁止事项 (Critical)
+
+* [ ] 禁止在主包存放超过 200KB 的 Lottie 资源，必须通过 URL 异步加载。
+* [ ] 禁止在 `setData` 逻辑中包含大量未使用的冗余字段。
+* [ ] 禁止在生产环境代码中残留 `console.log`（调试除外）。

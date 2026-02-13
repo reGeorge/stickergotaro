@@ -37,7 +37,7 @@ export interface User {
   homeRuns: number;
 }
 
-export type Tab = 'home' | 'shop' | 'profile' | 'stats' | 'moments';
+export type Tab = 'home' | 'shop' | 'profile' | 'moments';
 
 @Injectable({
   providedIn: 'root'

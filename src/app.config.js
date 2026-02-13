@@ -2,7 +2,6 @@ module.exports = {
   pages: [
     'pages/home/index',
     'pages/shop/index',
-    'pages/stats/index',
     'pages/moments/index',
     'pages/profile/index'
   ],
@@ -30,12 +29,6 @@ module.exports = {
         text: '梦想屋',
         iconPath: './assets/icons/shop.png',
         selectedIconPath: './assets/icons/shop-active.png'
-      },
-      {
-        pagePath: 'pages/stats/index',
-        text: '统计',
-        iconPath: './assets/icons/chart.png',
-        selectedIconPath: './assets/icons/chart-active.png'
       },
       {
         pagePath: 'pages/moments/index',
