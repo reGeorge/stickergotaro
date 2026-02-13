@@ -49,7 +49,7 @@ export default function Home() {
   }
 
   return (
-    <View className="min-h-screen bg-[#eff6ff] p-4 pb-24 font-sans">
+    <View className="min-h-screen bg-bg-blue p-4 pb-24 font-sans">
       {/* Header */}
       <View className="flex items-center justify-between px-2 mb-6">
         <View>
@@ -83,7 +83,7 @@ export default function Home() {
              </View>
              <View className="h-3 bg-black/20 rounded-full overflow-hidden">
                 <View 
-                  className="h-full bg-gradient-to-r from-yellow-300 to-amber-400 shadow-[0_0_15px_rgba(253,224,71,0.5)] transition-all duration-500 ease-out" 
+                  className="h-full bg-gradient-to-r from-yellow-300 to-amber-400 shadow-glow transition-all duration-500 ease-out" 
                   style={{ width: `${todaysProgress.percentage}%` }}
                 ></View>
              </View>
@@ -114,12 +114,12 @@ export default function Home() {
                     key={task.id}
                     onClick={() => toggleTask(task.id)}
                     className={classNames(
-                        "relative overflow-hidden bg-white p-4 rounded-2xl shadow-sm border border-indigo-50 flex items-center transition-all active:scale-[0.98]",
+                        "relative overflow-hidden bg-white p-4 rounded-2xl shadow-sm border border-indigo-50 flex items-center transition-all active:scale-98",
                         { "opacity-80": task.completed }
                     )}
                 >
                     {task.completed && (
-                        <View className="absolute inset-0 bg-emerald-50/70 flex items-center justify-end pr-6 z-10 backdrop-blur-[1px]">
+                        <View className="absolute inset-0 bg-emerald-50/70 flex items-center justify-end pr-6 z-10 backdrop-blur-xs">
                             <View className="bg-white px-3 py-1 rounded-full shadow-sm border border-emerald-100 flex items-center">
                                 <Text className="text-emerald-600 font-bold text-sm">✓ 完成</Text>
                             </View>

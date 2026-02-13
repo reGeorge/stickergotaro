@@ -41,7 +41,7 @@ export default function Profile() {
 
   if (mode !== 'view') {
     return (
-        <View className="min-h-screen bg-[#f7f8fa] p-4 font-sans pb-24">
+        <View className="min-h-screen bg-bg-gray p-4 font-sans pb-24">
             <View className="flex justify-between items-center mb-6">
                 <Text className="font-bold text-lg" onClick={() => setMode('view')}>&lt; 返回</Text>
                 <View className="flex gap-2">
@@ -99,7 +99,7 @@ export default function Profile() {
   }
 
   return (
-    <View className="min-h-screen bg-[#eff6ff] p-4 font-sans">
+    <View className="min-h-screen bg-bg-blue p-4 font-sans">
       <View className="bg-white p-6 rounded-3xl shadow-sm text-center mb-6 mt-4">
           <View className="w-24 h-24 bg-pink-50 rounded-full mx-auto mb-4 flex items-center justify-center text-5xl border-4 border-white shadow-inner">🐻</View>
           <Text className="text-xl font-bold text-slate-800 block">{user.name}</Text>
@@ -109,12 +109,12 @@ export default function Profile() {
           <View className="bg-orange-50 p-4 rounded-2xl text-center">
             <Text className="text-2xl block mb-1">🔥</Text>
             <Text className="text-xl font-bold text-orange-600 block">{user.streak}</Text>
-            <Text className="text-[10px] text-orange-400">连续打卡</Text>
+            <Text className="text-xxs text-orange-400">连续打卡</Text>
           </View>
           <View className="bg-purple-50 p-4 rounded-2xl text-center">
             <Text className="text-2xl block mb-1">⚾</Text>
             <Text className="text-xl font-bold text-purple-600 block">{user.homeRuns}</Text>
-            <Text className="text-[10px] text-purple-400">全垒打</Text>
+            <Text className="text-xxs text-purple-400">全垒打</Text>
           </View>
       </View>
 

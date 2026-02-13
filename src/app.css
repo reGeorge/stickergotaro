@@ -1,10 +1,12 @@
 
+/* 引入 Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* 覆盖小程序默认样式 */
+/* 设置根字号，确保 Tailwind 的 rem 单位正常工作 */
 page {
+  font-size: 28px; /* 小程序基准字号 */
   background-color: #eff6ff;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
 }
@@ -16,3 +18,4 @@ page {
   height: 0;
   color: transparent;
 }
+

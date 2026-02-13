@@ -76,21 +76,21 @@ export default function Stats() {
   }, [logs])
 
   return (
-    <View className="min-h-screen bg-[#eff6ff] p-4 pb-24 font-sans">
+    <View className="min-h-screen bg-bg-blue p-4 pb-24 font-sans">
         <Text className="text-lg font-bold text-gray-800 ml-2 mb-4 block">数据统计</Text>
 
         {/* Summary */}
         <View className="grid grid-cols-3 gap-3 px-2 mb-6">
             <View className="bg-blue-50 p-3 rounded-2xl text-center border border-blue-100">
-                <Text className="text-[10px] text-blue-400 font-bold mb-1 block">近7天收入</Text>
+                <Text className="text-xxs text-blue-400 font-bold mb-1 block">近7天收入</Text>
                 <Text className="text-lg font-bold text-blue-600">+{weekData.totalIncome}</Text>
             </View>
             <View className="bg-red-50 p-3 rounded-2xl text-center border border-red-100">
-                <Text className="text-[10px] text-red-400 font-bold mb-1 block">近7天支出</Text>
+                <Text className="text-xxs text-red-400 font-bold mb-1 block">近7天支出</Text>
                 <Text className="text-lg font-bold text-red-600">{weekData.totalExpense}</Text>
             </View>
             <View className="bg-green-50 p-3 rounded-2xl text-center border border-green-100">
-                <Text className="text-[10px] text-green-400 font-bold mb-1 block">净增长</Text>
+                <Text className="text-xxs text-green-400 font-bold mb-1 block">净增长</Text>
                 <Text className="text-lg font-bold text-green-600">{weekData.net}</Text>
             </View>
         </View>

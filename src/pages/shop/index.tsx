@@ -45,7 +45,7 @@ export default function Shop() {
   }
 
   return (
-    <View className="min-h-screen bg-[#eff6ff] p-4 pb-24 font-sans">
+    <View className="min-h-screen bg-bg-blue p-4 pb-24 font-sans">
         {/* Balance Sticky Header */}
         <View className="sticky top-0 z-20 py-2 -mx-2 mb-4 px-2">
             <View className="bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 rounded-full shadow-lg p-2 flex items-center justify-between px-5 text-white">
@@ -66,7 +66,7 @@ export default function Shop() {
                 return (
                     <View key={reward.id} className="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center relative overflow-hidden">
                         {reward.category === 'dream' && (
-                            <View className="absolute top-0 left-0 bg-gradient-to-br from-red-400 to-pink-500 text-white text-[10px] px-3 py-1 rounded-br-xl font-bold z-10">大梦想</View>
+                            <View className="absolute top-0 left-0 bg-gradient-to-br from-red-400 to-pink-500 text-white text-xxs px-3 py-1 rounded-br-xl font-bold z-10">大梦想</View>
                         )}
                         <View className="absolute top-3 right-3 bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded-lg text-xs font-bold border border-yellow-100">
                             {reward.cost} 🌟
@@ -83,7 +83,7 @@ export default function Shop() {
                             <Text>{reward.icon}</Text>
                         </View>
                         <Text className="font-bold text-slate-800 text-sm mb-1 block">{reward.title}</Text>
-                        <Text className="text-[10px] text-slate-400 mb-4 block h-4 overflow-hidden">{reward.description}</Text>
+                        <Text className="text-xxs text-slate-400 mb-4 block h-4 overflow-hidden">{reward.description}</Text>
 
                         <Button 
                             onClick={() => initiateRedeem(reward)}
@@ -115,7 +115,7 @@ export default function Shop() {
                                 <Button onClick={() => setSelectedReward(null)} className="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm">再想想</Button>
                                 <Button onClick={startVerification} className="flex-1 bg-indigo-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-indigo-200">确认兑换</Button>
                             </View>
-                            <Text className="text-[10px] text-orange-400 mt-4 bg-orange-50 inline-block px-3 py-1 rounded-full border border-orange-100">🔒 需家长验证</Text>
+                            <Text className="text-xxs text-orange-400 mt-4 bg-orange-50 inline-block px-3 py-1 rounded-full border border-orange-100">🔒 需家长验证</Text>
                         </>
                     ) : (
                         <>

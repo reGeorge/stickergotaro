@@ -39,9 +39,9 @@ export default function Moments() {
   }
 
   return (
-    <View className="min-h-screen bg-[#fff5f7] font-sans pb-24">
+    <View className="min-h-screen bg-bg-pink font-sans pb-24">
         {/* Header */}
-        <View className="sticky top-0 z-20 bg-[#fff5f7]/95 backdrop-blur-sm px-6 py-4 shadow-sm border-b border-pink-100 flex items-center justify-between">
+        <View className="sticky top-0 z-20 bg-bg-pink/95 backdrop-blur-sm px-6 py-4 shadow-sm border-b border-pink-100 flex items-center justify-between">
             <Text className="text-xl font-bold text-gray-800">📸 美好时光</Text>
             <View className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-xs font-bold" onClick={copyMoments}>导出</View>
         </View>
@@ -62,7 +62,7 @@ export default function Moments() {
                                     <Text className="text-gray-800 text-sm leading-relaxed font-medium">{m.description.replace('磁贴时刻: ', '')}</Text>
                                     <View className="flex flex-col items-end ml-3 shrink-0">
                                         <Text className="bg-yellow-50 text-yellow-600 font-bold text-xs px-2 py-1 rounded-lg border border-yellow-100">+{m.amount}</Text>
-                                        <Text className="text-[10px] text-gray-400 mt-1">{dayjs(m.timestamp).format('HH:mm')}</Text>
+                                        <Text className="text-xxs text-gray-400 mt-1">{dayjs(m.timestamp).format('HH:mm')}</Text>
                                     </View>
                                 </View>
                             </View>

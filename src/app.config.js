@@ -1,6 +1,4 @@
-import { defineAppConfig } from '@tarojs/taro'
-
-export default defineAppConfig({
+module.exports = {
   pages: [
     'pages/home/index',
     'pages/shop/index',
@@ -53,4 +51,4 @@ export default defineAppConfig({
       }
     ]
   }
-})
+}

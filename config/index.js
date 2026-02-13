@@ -1,6 +1,6 @@
 
-import { UnifiedWebpackPluginV5 } from 'weapp-tailwindcss/webpack'
-import path from 'path'
+const { UnifiedWebpackPluginV5 } = require('weapp-tailwindcss/webpack')
+const path = require('path')
 
 const config = {
   projectName: 'sticker-go-taro',
@@ -18,7 +18,7 @@ const config = {
   },
   copy: {
     patterns: [
-      { from: 'src/assets', to: 'dist/assets', ignore: ['*.tsx', '*.ts'] } // 复制静态资源
+      { from: 'src/assets', to: 'dist/assets', ignore: ['*.tsx', '*.ts'] }
     ],
     options: {
     }
@@ -26,28 +26,38 @@ const config = {
   framework: 'react',
   compiler: 'webpack5',
   cache: {
-    enable: false // 禁用缓存以避免 tailwind 类名生成问题
+    enable: false // 禁用缓存，避免 Tailwind 类名变动不生效
   },
   mini: {
     postcss: {
       pxtransform: {
         enable: true,
         config: {
-
         }
       },
       url: {
         enable: true,
         config: {
-          limit: 1024 // 设定转换尺寸上限
+          limit: 1024
         }
       },
       cssModules: {
-        enable: false, // 默认为 false，如需使用 css modules 功能，则设为 true
+        enable: false,
         config: {
-          namingPattern: 'module', // 转换模式，取值为 global/module
+          namingPattern: 'module',
           generateScopedName: '[name]__[local]___[hash:base64:5]'
         }
+      },
+      // 关键：显式配置 tailwindcss 插件
+      tailwindcss: {
+        enable: true,
+        config: {
+          // 留空则自动读取根目录 tailwind.config.js
+        }
+      },
+      autoprefixer: {
+        enable: true,
+        config: {}
       }
     },
     webpackChain(chain) {
@@ -57,7 +67,9 @@ const config = {
           install: {
             plugin: UnifiedWebpackPluginV5,
             args: [{
-              appType: 'taro'
+              appType: 'taro',
+              // 开启 rem 转 rpx，增强兼容性
+              rem2rpx: true
             }]
           }
         }
