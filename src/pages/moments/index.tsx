@@ -9,7 +9,23 @@ const Text = TaroText as any
 const Button = TaroButton as any
 
 export default function Moments() {
-  const { logs } = useStore()
+  const { logs, deleteLog } = useStore()
+  
+  const handleDeleteMoment = (logId: string) => {
+    Taro.showModal({
+      title: '确认删除',
+      content: '确定要删除这条美好记录吗？删除后无法恢复，磁贴数量也会相应调整。',
+      confirmText: '确定删除',
+      confirmColor: '#ef4444',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          deleteLog(logId)
+          Taro.showToast({ title: '删除成功', icon: 'success' })
+        }
+      }
+    })
+  }
 
   const moments = useMemo(() => {
     const list = logs.filter(l => l.type === 'magnet-moment').sort((a, b) => b.timestamp - a.timestamp)
@@ -73,9 +89,17 @@ export default function Moments() {
                                 <View className="bg-white p-4 rounded-3xl shadow-sm border border-pink-50">
                                     <View className="flex justify-between items-start">
                                         <Text className="text-gray-800 text-sm leading-relaxed font-medium">{m.description.replace('磁贴时刻: ', '')}</Text>
-                                        <View className="flex flex-col items-end ml-3 shrink-0">
-                                            <Text className="bg-yellow-50 text-yellow-600 font-bold text-xs px-2 py-1 rounded-lg border border-yellow-100">+{m.amount}</Text>
-                                            <Text className="text-xxs text-gray-400 mt-1">{dayjs(m.timestamp).format('HH:mm')}</Text>
+                                        <View className="flex flex-col items-end ml-3 shrink-0 gap-2">
+                                            <View className="flex items-center gap-2">
+                                                <Text className="bg-yellow-50 text-yellow-600 font-bold text-xs px-2 py-1 rounded-lg border border-yellow-100">+{m.amount}</Text>
+                                                <View 
+                                                  onClick={(e) => { e.stopPropagation(); handleDeleteMoment(m.id); }}
+                                                  className="w-6 h-6 bg-red-50 rounded-full flex items-center justify-center active:bg-red-100 transition-all"
+                                                >
+                                                    <Text className="text-xs text-red-400">✕</Text>
+                                                </View>
+                                            </View>
+                                            <Text className="text-xxs text-gray-400">{dayjs(m.timestamp).format('HH:mm')}</Text>
                                         </View>
                                     </View>
                                 </View>

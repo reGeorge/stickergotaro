@@ -17,8 +17,10 @@ export default function Home() {
   
   // Computed
   const todaysProgress = useMemo(() => {
-    const completed = tasks.filter(t => t.completed).length
-    const total = tasks.length
+    // 计算已完成次数总和（每个任务执行一次就加一）
+    const completed = tasks.reduce((sum, t) => sum + (t.completedCount || 0), 0)
+    // 总目标 = 所有任务的每日上限总和
+    const total = tasks.reduce((sum, t) => sum + (t.dailyLimit || 1), 0)
     return { completed, total, percentage: total === 0 ? 0 : (completed / total) * 100 }
   }, [tasks])
 
@@ -31,6 +33,20 @@ export default function Home() {
   const [showMagnets, setShowMagnets] = useState(false)
 
   // --- Handlers ---
+  
+  const handleTaskClick = (taskId: string, taskTitle: string) => {
+    Taro.showModal({
+      title: '确认完成约定',
+      content: `确定要完成"${taskTitle}"吗？`,
+      confirmText: '完成了',
+      cancelText: '再想想',
+      success: (res) => {
+        if (res.confirm) {
+          toggleTask(taskId)
+        }
+      }
+    })
+  }
   
   const handleMoodConvert = (moodLabel: string) => {
     // 模拟延迟
@@ -65,17 +81,6 @@ export default function Home() {
                 className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md shadow-inner border border-white/20 active:scale-95 transition-all shrink-0"
              >
                 <Text className="text-3xl">🛒</Text>
-             </View>
-             
-             {/* 中间：磁贴数量 */}
-             <View className="flex items-center gap-3">
-                <View className="text-center">
-                    <Text className="text-pink-100 text-xs font-bold mb-2 uppercase tracking-wide block">我的磁贴</Text>
-                    <View className="flex items-center justify-center">
-                        <Text className="text-4xl font-black">{user.magnets}</Text>
-                        <Text className="text-2xl ml-2 opacity-80">🌟</Text>
-                    </View>
-                </View>
              </View>
              
              {/* 右侧：问候文字 */}
@@ -126,7 +131,7 @@ export default function Home() {
                 return (
                     <View 
                         key={task.id}
-                        onClick={() => toggleTask(task.id)}
+                        onClick={() => handleTaskClick(task.id, task.title)}
                         className={classNames(
                             "relative overflow-hidden bg-white p-6 rounded-3xl shadow-sm border border-indigo-50 transition-all active:scale-98 min-h-[160rpx]",
                             { "opacity-80": isFullyCompleted }

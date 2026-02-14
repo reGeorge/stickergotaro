@@ -57,6 +57,7 @@ interface StoreState {
   spendMagnets: (amount: number, description: string) => boolean;
   toggleTask: (taskId: string) => void;
   checkDailyReset: () => void;
+  deleteLog: (logId: string) => void;
   
   // Admin Actions
   addTask: (title: string, icon: string, reward: number) => void;
@@ -249,6 +250,30 @@ export const useStore = create<StoreState>()(
         rewards: s.rewards.map(r => r.id === id ? { ...r, ...updates } : r)
       })),
       deleteReward: (id) => set(s => ({ rewards: s.rewards.filter(r => r.id !== id) })),
+      
+      deleteLog: (logId) => {
+        const state = get();
+        const log = state.logs.find(l => l.id === logId);
+        
+        if (!log) return;
+        
+        // 如果是获得磁贴的记录，需要扣除相应数量
+        if (log.amount > 0 && ['earn', 'bonus', 'mood', 'magnet-moment'].includes(log.type)) {
+          set(s => ({
+            user: { ...s.user, magnets: Math.max(0, s.user.magnets - log.amount) },
+            logs: s.logs.filter(l => l.id !== logId)
+          }));
+        } else if (log.amount < 0 && log.type === 'spend') {
+          // 如果是消费记录，需要返还磁贴
+          set(s => ({
+            user: { ...s.user, magnets: s.user.magnets + Math.abs(log.amount) },
+            logs: s.logs.filter(l => l.id !== logId)
+          }));
+        } else {
+          // 其他情况只删除记录
+          set(s => ({ logs: s.logs.filter(l => l.id !== logId) }));
+        }
+      },
 
       importConfig: (type, data) => {
         if (type === 'tasks') set({ tasks: data });

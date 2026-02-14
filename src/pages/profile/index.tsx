@@ -27,7 +27,7 @@ export default function Profile() {
 
   // Task handlers
   const openAddTask = () => {
-    setEditingTask({ title: '', icon: '⭐', magnetReward: 1, dailyLimit: 1 })
+    setEditingTask({ title: '', icon: '⭐', magnetReward: undefined, dailyLimit: undefined })
     setShowEditModal(true)
   }
 
@@ -41,11 +41,21 @@ export default function Profile() {
       Taro.showToast({ title: '请填写任务名称', icon: 'none' })
       return
     }
+    // 校验磁贴奖励
+    if (!editingTask.magnetReward || editingTask.magnetReward < 1) {
+      Taro.showToast({ title: '磁贴奖励至少为1', icon: 'none' })
+      return
+    }
+    // 校验每日次数
+    if (!editingTask.dailyLimit || editingTask.dailyLimit < 1) {
+      Taro.showToast({ title: '每日次数至少为1', icon: 'none' })
+      return
+    }
     if (editingTask.id) {
       updateTask(editingTask.id, editingTask)
       Taro.showToast({ title: '更新成功', icon: 'success' })
     } else {
-      addTask(editingTask.title!, editingTask.icon || '⭐', editingTask.magnetReward || 1)
+      addTask(editingTask.title!, editingTask.icon || '⭐', editingTask.magnetReward!)
       Taro.showToast({ title: '添加成功', icon: 'success' })
     }
     setShowEditModal(false)
@@ -54,7 +64,7 @@ export default function Profile() {
 
   // Reward handlers
   const openAddReward = () => {
-    setEditingReward({ title: '', icon: '🎁', cost: 1, description: '', category: 'small' })
+    setEditingReward({ title: '', icon: '🎁', cost: undefined, description: '', category: 'small', dailyLimit: undefined })
     setShowEditModal(true)
   }
 
@@ -68,11 +78,21 @@ export default function Profile() {
       Taro.showToast({ title: '请填写奖励名称', icon: 'none' })
       return
     }
+    // 校验磁贴花费
+    if (!editingReward.cost || editingReward.cost < 1) {
+      Taro.showToast({ title: '磁贴花费至少为1', icon: 'none' })
+      return
+    }
+    // 校验每日次数
+    if (!editingReward.dailyLimit || editingReward.dailyLimit < 1) {
+      Taro.showToast({ title: '每日次数至少为1', icon: 'none' })
+      return
+    }
     if (editingReward.id) {
       updateReward(editingReward.id, editingReward)
       Taro.showToast({ title: '更新成功', icon: 'success' })
     } else {
-      addReward(editingReward.title!, editingReward.icon || '🎁', editingReward.cost || 1, editingReward.description || '')
+      addReward(editingReward.title!, editingReward.icon || '🎁', editingReward.cost!, editingReward.description || '')
       Taro.showToast({ title: '添加成功', icon: 'success' })
     }
     setShowEditModal(false)
@@ -211,8 +231,12 @@ export default function Profile() {
                             <Input 
                                 type="number"
                                 className="w-full bg-slate-50 rounded-xl p-3 text-sm"
-                                value={String(editingTask.magnetReward || 1)}
-                                onInput={(e) => setEditingTask({ ...editingTask, magnetReward: Number(e.detail.value) })}
+                                value={editingTask.magnetReward !== undefined ? String(editingTask.magnetReward) : ''}
+                                onInput={(e) => {
+                                  const val = e.detail.value
+                                  setEditingTask({ ...editingTask, magnetReward: val === '' ? undefined : Number(val) })
+                                }}
+                                placeholder="请输入磁贴奖励数量"
                             />
                         </View>
                         
@@ -221,8 +245,12 @@ export default function Profile() {
                             <Input 
                                 type="number"
                                 className="w-full bg-slate-50 rounded-xl p-3 text-sm"
-                                value={String(editingTask.dailyLimit || 1)}
-                                onInput={(e) => setEditingTask({ ...editingTask, dailyLimit: Number(e.detail.value) })}
+                                value={editingTask.dailyLimit !== undefined ? String(editingTask.dailyLimit) : ''}
+                                onInput={(e) => {
+                                  const val = e.detail.value
+                                  setEditingTask({ ...editingTask, dailyLimit: val === '' ? undefined : Number(val) })
+                                }}
+                                placeholder="请输入每日最多完成次数"
                             />
                         </View>
                         
@@ -262,8 +290,12 @@ export default function Profile() {
                             <Input 
                                 type="number"
                                 className="w-full bg-slate-50 rounded-xl p-3 text-sm"
-                                value={String(editingReward.cost || 1)}
-                                onInput={(e) => setEditingReward({ ...editingReward, cost: Number(e.detail.value) })}
+                                value={editingReward.cost !== undefined ? String(editingReward.cost) : ''}
+                                onInput={(e) => {
+                                  const val = e.detail.value
+                                  setEditingReward({ ...editingReward, cost: val === '' ? undefined : Number(val) })
+                                }}
+                                placeholder="请输入磁贴花费数量"
                             />
                         </View>
                         
@@ -282,8 +314,12 @@ export default function Profile() {
                             <Input
                                 type="number"
                                 className="w-full bg-slate-50 rounded-xl p-3 text-sm"
-                                value={String(editingReward.dailyLimit || 1)}
-                                onInput={(e) => setEditingReward({ ...editingReward, dailyLimit: Number(e.detail.value) })}
+                                value={editingReward.dailyLimit !== undefined ? String(editingReward.dailyLimit) : ''}
+                                onInput={(e) => {
+                                  const val = e.detail.value
+                                  setEditingReward({ ...editingReward, dailyLimit: val === '' ? undefined : Number(val) })
+                                }}
+                                placeholder="请输入每日最多兑换次数"
                             />
                         </View>
 
