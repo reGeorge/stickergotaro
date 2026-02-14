@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import Taro from '@tarojs/taro'
 import dayjs from 'dayjs'
 import { soundService } from '../utils/sound'
+import { FeedbackService } from './feedback.service'
 
 // --- Interfaces (复用原项目) ---
 export interface Task {
@@ -211,6 +212,12 @@ export const useStore = create<StoreState>()(
         if (allCompleted && !alreadyBonus) {
            get().addMagnets(5, '全垒打！今日五项全能达成！', 'bonus');
            set(s => ({ user: { ...s.user, homeRuns: s.user.homeRuns + 1 } }));
+           
+           // 触发全垒打动画
+           FeedbackService.showTaskComplete(taskId, true);
+        } else {
+           // 触发普通任务完成动画
+           FeedbackService.showTaskComplete(taskId, false);
         }
       },
 

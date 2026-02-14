@@ -4,6 +4,7 @@ import { useStore } from '../../store/useStore'
 import classNames from 'classnames'
 import Taro from '@tarojs/taro'
 import { soundService } from '../../utils/sound'
+import RewardAnimation from '../../components/RewardAnimation'
 
 const View = TaroView as any
 const Text = TaroText as any
@@ -52,34 +53,42 @@ export default function Home() {
 
   return (
     <View className="min-h-screen bg-bg-blue p-4 pb-24 font-sans">
+      {/* 全屏反馈动画层 */}
+      <RewardAnimation />
+      
       {/* Stats Card */}
       <View className="bg-gradient-to-br from-pink-400 via-rose-400 to-purple-400 rounded-3xl p-6 text-white shadow-xl shadow-pink-200 relative overflow-hidden mb-6">
-        <View className="flex justify-between items-start mb-6 relative z-10">
-             <View className="flex-1">
-                <Text className="text-white/90 text-sm mb-2 block">你好, {user.name}! 👋</Text>
-                <Text className="text-pink-100 text-xs">今天也要加油收集磁贴哦！</Text>
+        <View className="flex justify-between items-start mb-8 relative z-10">
+             {/* 左侧：购物车图标 */}
+             <View
+                onClick={() => setShowMagnets(true)}
+                className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md shadow-inner border border-white/20 active:scale-95 transition-all shrink-0"
+             >
+                <Text className="text-3xl">🛒</Text>
              </View>
+             
+             {/* 中间：磁贴数量 */}
              <View className="flex items-center gap-3">
-                <View className="text-right">
-                    <Text className="text-pink-100 text-xs font-bold mb-1 uppercase tracking-wide block">我的磁贴</Text>
-                    <View className="flex items-center">
+                <View className="text-center">
+                    <Text className="text-pink-100 text-xs font-bold mb-2 uppercase tracking-wide block">我的磁贴</Text>
+                    <View className="flex items-center justify-center">
                         <Text className="text-4xl font-black">{user.magnets}</Text>
-                        <Text className="text-2xl ml-1 opacity-80">🌟</Text>
+                        <Text className="text-2xl ml-2 opacity-80">🌟</Text>
                     </View>
                 </View>
-                <View
-                   onClick={() => setShowMagnets(true)}
-                   className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md shadow-inner border border-white/20 active:scale-95 transition-all shrink-0"
-                >
-                   <Text className="text-3xl">🛒</Text>
-                </View>
+             </View>
+             
+             {/* 右侧：问候文字 */}
+             <View className="flex-1 text-right">
+                <Text className="text-white/90 text-base mb-3 block font-semibold tracking-wide">你好, {user.name}! 👋</Text>
+                <Text className="text-pink-100 text-sm leading-relaxed">今天也要加油收集磁贴哦！</Text>
              </View>
         </View>
 
-        <View className="bg-black/10 rounded-2xl p-4 backdrop-blur-md border border-white/10 relative z-10">
-             <View className="flex justify-between items-center mb-2">
-                <Text className="text-xs font-bold text-white/90">每日约定场景</Text>
-                <Text className="text-xs font-bold text-pink-100">{todaysProgress.completed} / {todaysProgress.total}</Text>
+        <View className="bg-black/10 rounded-2xl p-5 backdrop-blur-md border border-white/10 relative z-10">
+             <View className="flex justify-between items-center mb-3">
+                <Text className="text-sm font-bold text-white/90 tracking-wide">每日约定场景</Text>
+                <Text className="text-sm font-bold text-pink-100">{todaysProgress.completed} / {todaysProgress.total}</Text>
              </View>
              <View className="h-3 bg-black/20 rounded-full overflow-hidden">
                 <View 
@@ -92,17 +101,17 @@ export default function Home() {
 
       {/* Quick Actions */}
       <View className="grid grid-cols-2 gap-4 px-1 mb-6">
-        <View onClick={() => setShowMoment(true)} className="bg-white p-4 rounded-2xl shadow-sm border border-pink-100 flex flex-col items-center justify-center active:scale-95 transition-all h-28">
-           <View className="w-10 h-10 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center text-xl mb-2">
+        <View onClick={() => setShowMoment(true)} className="bg-white p-5 rounded-2xl shadow-sm border border-pink-100 flex flex-col items-center justify-center active:scale-95 transition-all min-h-[120rpx]">
+           <View className="w-10 h-10 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center text-xl mb-3">
              <Text>📸</Text>
            </View>
-           <Text className="text-xs font-bold text-slate-600">磁贴时刻</Text>
+           <Text className="text-sm font-bold text-slate-600">磁贴时刻</Text>
         </View>
-        <View onClick={() => { setMoodSuccess(false); setShowMood(true); }} className="bg-white p-4 rounded-2xl shadow-sm border border-purple-100 flex flex-col items-center justify-center active:scale-95 transition-all h-28">
-           <View className="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xl mb-2">
+        <View onClick={() => { setMoodSuccess(false); setShowMood(true); }} className="bg-white p-5 rounded-2xl shadow-sm border border-purple-100 flex flex-col items-center justify-center active:scale-95 transition-all min-h-[120rpx]">
+           <View className="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xl mb-3">
              <Text>🌈</Text>
            </View>
-           <Text className="text-xs font-bold text-slate-600">心情转换</Text>
+           <Text className="text-sm font-bold text-slate-600">心情转换</Text>
         </View>
       </View>
 
@@ -119,31 +128,33 @@ export default function Home() {
                         key={task.id}
                         onClick={() => toggleTask(task.id)}
                         className={classNames(
-                            "relative overflow-hidden bg-white p-4 rounded-2xl shadow-sm border border-indigo-50 flex items-center transition-all active:scale-98",
+                            "relative overflow-hidden bg-white p-6 rounded-3xl shadow-sm border border-indigo-50 transition-all active:scale-98 min-h-[160rpx]",
                             { "opacity-80": isFullyCompleted }
                         )}
                     >
                         {isFullyCompleted && (
                             <View className="absolute inset-0 bg-emerald-50/70 flex items-center justify-end pr-6 z-10 backdrop-blur-xs">
-                                <View className="bg-white px-3 py-1 rounded-full shadow-sm border border-emerald-100 flex items-center">
+                                <View className="bg-white px-4 py-2 rounded-full shadow-sm border border-emerald-100 flex items-center">
                                     <Text className="text-emerald-600 font-bold text-sm">✓ 已达上限</Text>
                                 </View>
                             </View>
                         )}
-                        <View className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-2xl mr-4 shrink-0">
-                            <Text>{task.icon}</Text>
-                        </View>
-                        <View className="flex-1 min-w-0">
-                            <Text className="font-bold text-slate-800 text-sm block truncate">{task.title}</Text>
-                            <View className="flex items-center gap-2 mt-1">
-                                <View className="inline-block bg-indigo-50 px-2 py-0.5 rounded-lg">
-                                    <Text className="text-xs text-indigo-500 font-bold">+{task.magnetReward} 磁贴</Text>
-                                </View>
-                                {dailyLimit > 1 && (
-                                    <View className="inline-block bg-orange-50 px-2 py-0.5 rounded-lg">
-                                        <Text className="text-xs text-orange-500 font-bold">{completedCount}/{dailyLimit}</Text>
+                        <View className="flex justify-between items-center gap-4">
+                            <View className="w-14 h-14 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl flex items-center justify-center text-3xl shrink-0 shadow-sm">
+                                <Text>{task.icon}</Text>
+                            </View>
+                            <View className="flex-1 min-w-0 flex flex-col space-y-2">
+                                <Text className="font-bold text-slate-800 text-base block truncate tracking-wide">{task.title}</Text>
+                                <View className="flex items-center gap-2 flex-wrap">
+                                    <View className="inline-block bg-gradient-to-r from-indigo-50 to-purple-50 px-3 py-1 rounded-xl border border-indigo-100/50">
+                                        <Text className="text-xs text-indigo-600 font-bold">+{task.magnetReward} 磁贴</Text>
                                     </View>
-                                )}
+                                    {dailyLimit > 1 && (
+                                        <View className="inline-block bg-gradient-to-r from-orange-50 to-amber-50 px-3 py-1 rounded-xl border border-orange-100/50">
+                                            <Text className="text-xs text-orange-600 font-bold">{completedCount}/{dailyLimit}</Text>
+                                        </View>
+                                    )}
+                                </View>
                             </View>
                         </View>
                     </View>
