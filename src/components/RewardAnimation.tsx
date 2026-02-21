@@ -2,12 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import Taro from '@tarojs/taro'
 import lottie from 'lottie-miniprogram'
 import { useFeedbackStore } from '../store/feedback.service'
-import { View as TaroView, Text as TaroText, Canvas as TaroCanvas, Image as TaroImage } from '@tarojs/components'
+import { View as TaroView, Text as TaroText, Canvas as TaroCanvas } from '@tarojs/components'
 
 const View = TaroView as any
 const Text = TaroText as any
 const Canvas = TaroCanvas as any
-const Image = TaroImage as any
 
 export default function RewardAnimation() {
   const { isVisible, animationConfig, isHomeRun, hideFeedback } = useFeedbackStore()
@@ -126,21 +125,89 @@ export default function RewardAnimation() {
         {/* 备用 CSS 动画 或 Lottie Canvas */}
         {animationConfig.useFallback || loadError ? (
           <View className="w-80 h-80 flex items-center justify-center">
-            {/* 简单的庆祝动画效果 */}
-            <View className="relative">
-              {/* 中心星星 */}
-              <View className="text-8xl animate-bounce">⭐</View>
-              
-              {/* 环绕的小星星 */}
-              <View className="absolute -top-8 -left-8 text-4xl animate-ping">✨</View>
-              <View className="absolute -top-8 -right-8 text-4xl animate-ping" style={{ animationDelay: '0.2s' }}>✨</View>
-              <View className="absolute -bottom-8 -left-8 text-4xl animate-ping" style={{ animationDelay: '0.4s' }}>✨</View>
-              <View className="absolute -bottom-8 -right-8 text-4xl animate-ping" style={{ animationDelay: '0.6s' }}>✨</View>
-              
-              {/* 彩带 */}
-              <View className="absolute -top-12 left-1/2 transform -translate-x-1/2 text-3xl animate-bounce">🎉</View>
-              <View className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 text-3xl animate-bounce" style={{ animationDelay: '0.3s' }}>🎊</View>
-            </View>
+            {/* 根据动画类型选择不同的动画效果 */}
+            {animationConfig.text.includes('兑换') ? (
+              // 兑换奖励动画 - 礼物盒 + 磁贴吸入效果
+              <View className="relative w-64 h-64">
+                {/* 背景旋转光芒 */}
+                <View className="absolute inset-0 flex items-center justify-center animate-spin-slow opacity-20">
+                  <View className="w-64 h-64 rounded-full bg-gradient-to-r from-yellow-200 via-pink-200 to-purple-200"></View>
+                </View>
+                
+                {/* 核心礼物盒 - 使用多个弹跳效果 */}
+                <View className="absolute inset-0 flex items-center justify-center animate-pop-in z-10">
+                  <View className="text-9xl animate-bounce drop-shadow-[0_20px_40px_rgba(0,0,0,0.3)]">🎁</View>
+                </View>
+                
+                {/* 被吸入的磁贴粒子 */}
+                <View className="absolute top-8 left-12 text-4xl animate-suck-in opacity-80" 
+                      style={{'--tx': '50px', '--ty': '90px'} as any}>🧲</View>
+                <View className="absolute top-12 right-12 text-4xl animate-suck-in opacity-80" 
+                      style={{'--tx': '-50px', '--ty': '80px', animationDelay: '0.2s'} as any}>🧲</View>
+                <View className="absolute top-0 left-1/2 transform -translate-x-1/2 text-4xl animate-suck-in opacity-80" 
+                      style={{'--tx': '0px', '--ty': '100px', animationDelay: '0.4s'} as any}>🧲</View>
+                
+                {/* 彩带装饰 */}
+                <View className="absolute -top-10 left-1/2 transform -translate-x-1/2 text-3xl animate-bounce">🎊</View>
+                <View className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-3xl animate-bounce" style={{ animationDelay: '0.3s' }}>🎉</View>
+              </View>
+            ) : isHomeRun ? (
+              // 全垒打特殊动画 - 更强烈的庆祝效果
+              <View className="relative w-64 h-64">
+                {/* 背景光环炸裂 */}
+                <View className="absolute inset-0 flex items-center justify-center animate-burst-out opacity-30">
+                  <View className="w-64 h-64 rounded-full bg-gradient-to-br from-brand-primary via-brand-secondary to-brand-accent"></View>
+                </View>
+                
+                {/* 中心大奖杯 */}
+                <View className="absolute inset-0 flex items-center justify-center animate-pop-in z-10">
+                  <View className="text-9xl drop-shadow-[0_20px_40px_rgba(168,85,247,0.5)]">🏆</View>
+                </View>
+                
+                {/* 环绕的星星 */}
+                <View className="absolute -top-12 -left-12 text-5xl animate-ping">✨</View>
+                <View className="absolute -top-12 -right-12 text-5xl animate-ping" style={{ animationDelay: '0.2s' }}>⭐</View>
+                <View className="absolute -bottom-12 -left-12 text-5xl animate-ping" style={{ animationDelay: '0.4s' }}>🌟</View>
+                <View className="absolute -bottom-12 -right-12 text-5xl animate-ping" style={{ animationDelay: '0.6s' }}>💫</View>
+                
+                {/* 彩带和烟花 */}
+                <View className="absolute -top-16 left-1/2 transform -translate-x-1/2 text-4xl animate-bounce">🎉</View>
+                <View className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-4xl animate-bounce" style={{ animationDelay: '0.3s' }}>🎊</View>
+                <View className="absolute top-0 -left-16 text-3xl animate-float" style={{ animationDelay: '0.5s' }}>🎆</View>
+                <View className="absolute top-0 -right-16 text-3xl animate-float" style={{ animationDelay: '0.7s' }}>🎇</View>
+              </View>
+            ) : (
+              // 普通任务完成动画 - 磁贴弹出效果
+              <View className="relative w-64 h-64">
+                {/* 背景光环炸裂 */}
+                <View className="absolute inset-0 flex items-center justify-center animate-burst-out opacity-40">
+                  <View className="w-48 h-48 rounded-full bg-gradient-to-br from-brand-primary via-brand-secondary to-brand-accent"></View>
+                </View>
+                
+                {/* 核心磁贴图标 */}
+                <View className="absolute inset-0 flex items-center justify-center animate-pop-in z-10">
+                  <View className="animate-float">
+                    <View className="text-9xl drop-shadow-[0_20px_40px_rgba(168,85,247,0.5)]">🧲</View>
+                  </View>
+                </View>
+                
+                {/* 周围炸裂的小星星 */}
+                {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+                  <View 
+                    key={i} 
+                    className="absolute top-1/2 left-1/2 text-3xl animate-burst-out" 
+                    style={{ 
+                      transform: `rotate(${angle}deg) translate(80px) translate(-50%, -50%)`,
+                      animationDelay: `${i * 0.05}s`
+                    }}
+                  >⭐</View>
+                ))}
+                
+                {/* 额外装饰 */}
+                <View className="absolute -top-10 left-1/2 transform -translate-x-1/2 text-2xl animate-bounce">✨</View>
+                <View className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-2xl animate-bounce" style={{ animationDelay: '0.2s' }}>💫</View>
+              </View>
+            )}
           </View>
         ) : (
           <Canvas

@@ -48,7 +48,38 @@ module.exports = {
       // --- 点击反馈 ---
       scale: {
         '95': '0.95',
-      }
+      },
+      // --- 自定义动画关键帧 ---
+      animation: {
+        'pop-in': 'popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        'float': 'float 3s ease-in-out infinite',
+        'burst-out': 'burstOut 0.8s ease-out forwards',
+        'spin-slow': 'spin 8s linear infinite',
+        'suck-in': 'suckIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+        'gift-open': 'giftOpen 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.3s',
+      },
+      keyframes: {
+        popIn: {
+          '0%': { opacity: '0', transform: 'scale(0.5)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        burstOut: {
+          '0%': { opacity: '1', transform: 'scale(0)' },
+          '100%': { opacity: '0', transform: 'scale(2)' },
+        },
+        suckIn: {
+          '0%': { opacity: '1', transform: 'translate(0, 0) scale(1)' },
+          '100%': { opacity: '0', transform: 'translate(var(--tx), var(--ty)) scale(0.2)' },
+        },
+        giftOpen: {
+          '0%': { transform: 'rotate(0)' },
+          '100%': { transform: 'rotate(-20deg) translateY(-10px)' },
+        },
+      },
     },
   },
   plugins: [],

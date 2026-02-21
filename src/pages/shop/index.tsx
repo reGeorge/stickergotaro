@@ -4,6 +4,8 @@ import { useStore, Reward } from '../../store/useStore'
 import classNames from 'classnames'
 import Taro from '@tarojs/taro'
 import { soundService } from '../../utils/sound'
+import { FeedbackService } from '../../store/feedback.service'
+import RewardAnimation from '../../components/RewardAnimation'
 
 const View = TaroView as any
 const Text = TaroText as any
@@ -35,9 +37,12 @@ export default function Shop() {
     if (val === mathProblem.a && selectedReward) {
         const success = spendMagnets(selectedReward.cost, `兑换: ${selectedReward.title}`)
         if (success) {
-            Taro.showToast({ title: '兑换成功！', icon: 'success' })
             setSelectedReward(null)
             setShowMath(false)
+            // 触发兑换成功动画
+            FeedbackService.showRedeemSuccess()
+        } else {
+            Taro.showToast({ title: '磁贴不足', icon: 'error' })
         }
     } else {
         Taro.showToast({ title: '算错了哦', icon: 'error' })
@@ -48,6 +53,9 @@ export default function Shop() {
 
   return (
     <View className="min-h-screen bg-bg-blue p-4 pb-24 font-sans">
+        {/* 全屏反馈动画层 */}
+        <RewardAnimation />
+        
         {/* Balance Sticky Header */}
         <View className="sticky top-0 z-20 py-2 -mx-2 mb-4 px-2">
             <View

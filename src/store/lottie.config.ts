@@ -53,7 +53,7 @@ const CONFETTI_ANIMATION = {
 };
 
 export const LOTTIE_ANIMATIONS: Record<string, LottieAnimationConfig> = {
-  // 吃饭香香 - 使用备用动画
+  // 吃饭香香 - 使用 SVG 动画
   '1': {
     useFallback: true,
     text: '吃饭真香！太棒了！',
@@ -88,11 +88,11 @@ export const LOTTIE_ANIMATIONS: Record<string, LottieAnimationConfig> = {
     duration: 3000
   },
   
-  // 默认动画（彩色撒花）
+  // 默认动画（获得磁贴）
   'default': {
-    animationData: CONFETTI_ANIMATION,
+    useFallback: true,
     text: '挑战成功！',
-    duration: 2500
+    duration: 3000
   },
   
   // 全垒打动画（第5个任务完成）
@@ -100,6 +100,13 @@ export const LOTTIE_ANIMATIONS: Record<string, LottieAnimationConfig> = {
     useFallback: true,
     text: '🎉 全垒打！五项全能达成！',
     duration: 4000
+  },
+  
+  // 兑换成功动画
+  'redeem': {
+    useFallback: true,
+    text: '🎁 兑换成功！梦想成真！',
+    duration: 3000
   }
 };
 
@@ -115,4 +122,11 @@ export function getTaskAnimation(taskId: string): LottieAnimationConfig {
  */
 export function getHomeRunAnimation(): LottieAnimationConfig {
   return LOTTIE_ANIMATIONS['homeRun'];
+}
+
+/**
+ * 获取兑换成功动画配置
+ */
+export function getRedeemAnimation(): LottieAnimationConfig {
+  return LOTTIE_ANIMATIONS['redeem'];
 }

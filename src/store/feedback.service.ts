@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
-import { getTaskAnimation, getHomeRunAnimation, LottieAnimationConfig } from './lottie.config'
+import { getTaskAnimation, getHomeRunAnimation, getRedeemAnimation, LottieAnimationConfig } from './lottie.config'
 
 export interface FeedbackState {
   isVisible: boolean
@@ -9,6 +9,7 @@ export interface FeedbackState {
   
   // Actions
   showFeedback: (taskId: string, isHomeRun?: boolean) => void
+  showRedeemFeedback: () => void
   hideFeedback: () => void
 }
 
@@ -26,6 +27,16 @@ export const useFeedbackStore = create<FeedbackState>((set) => ({
       isVisible: true,
       animationConfig: config,
       isHomeRun
+    })
+  },
+  
+  showRedeemFeedback: () => {
+    const config = getRedeemAnimation()
+    
+    set({
+      isVisible: true,
+      animationConfig: config,
+      isHomeRun: false
     })
   },
   
@@ -51,6 +62,17 @@ export class FeedbackService {
     
     // 显示动画
     useFeedbackStore.getState().showFeedback(taskId, isHomeRun)
+  }
+  
+  /**
+   * 触发兑换成功反馈
+   */
+  static showRedeemSuccess() {
+    // 触发震动
+    Taro.vibrateShort({ type: 'medium' })
+    
+    // 显示动画
+    useFeedbackStore.getState().showRedeemFeedback()
   }
   
   /**
