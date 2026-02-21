@@ -1,6 +1,6 @@
 import { View as TaroView, Text as TaroText, Image as TaroImage, Textarea as TaroTextarea, Button as TaroButton } from '@tarojs/components'
 import { useState, useMemo } from 'react'
-import { useStore } from '../../store/useStore'
+import { useStore, Task } from '../../store/useStore'
 import classNames from 'classnames'
 import Taro from '@tarojs/taro'
 import { soundService } from '../../utils/sound'
@@ -13,16 +13,22 @@ const Textarea = TaroTextarea as any
 const Button = TaroButton as any
 
 export default function Home() {
-  const { user, tasks, toggleTask, addMagnets } = useStore()
+  const { user, tasks, toggleTask, toggleMonthlyTask, addMagnets } = useStore()
+  
+  // Tab 切换状态
+  const [activeTab, setActiveTab] = useState<'daily' | 'monthly'>('daily')
+  
+  // 按类型过滤任务
+  const dailyTasks = useMemo(() => tasks.filter(t => t.type === 'daily'), [tasks])
+  const monthlyTasks = useMemo(() => tasks.filter(t => t.type === 'monthly'), [tasks])
   
   // Computed
   const todaysProgress = useMemo(() => {
-    // 计算已完成次数总和（每个任务执行一次就加一）
-    const completed = tasks.reduce((sum, t) => sum + (t.completedCount || 0), 0)
-    // 总目标 = 所有任务的每日上限总和
-    const total = tasks.reduce((sum, t) => sum + (t.dailyLimit || 1), 0)
+    // 只计算每日任务的进度
+    const completed = dailyTasks.reduce((sum, t) => sum + (t.completedCount || 0), 0)
+    const total = dailyTasks.reduce((sum, t) => sum + (t.dailyLimit || 1), 0)
     return { completed, total, percentage: total === 0 ? 0 : (completed / total) * 100 }
-  }, [tasks])
+  }, [dailyTasks])
 
   // Local State for Modals
   const [showMood, setShowMood] = useState(false)
@@ -104,6 +110,34 @@ export default function Home() {
         </View>
       </View>
 
+      {/* Tab Switcher - 滑动胶囊设计 */}
+      <View className="px-1 mb-6">
+        <View className="bg-white/30 backdrop-blur-md rounded-full p-1.5 flex border border-white/50 shadow-lg">
+          <View 
+            onClick={() => setActiveTab('daily')}
+            className={classNames(
+              "flex-1 py-3 rounded-full text-center font-bold text-sm transition-all duration-300",
+              activeTab === 'daily' 
+                ? "bg-white shadow-md text-indigo-600" 
+                : "text-slate-500"
+            )}
+          >
+            <Text>⚡ 今日挑战</Text>
+          </View>
+          <View 
+            onClick={() => setActiveTab('monthly')}
+            className={classNames(
+              "flex-1 py-3 rounded-full text-center font-bold text-sm transition-all duration-300",
+              activeTab === 'monthly' 
+                ? "bg-white shadow-md text-indigo-600" 
+                : "text-slate-500"
+            )}
+          >
+            <Text>🏆 恒心榜单</Text>
+          </View>
+        </View>
+      </View>
+
       {/* Quick Actions */}
       <View className="grid grid-cols-2 gap-4 px-1 mb-6">
         <View onClick={() => setShowMoment(true)} className="bg-white p-5 rounded-2xl shadow-sm border border-pink-100 flex flex-col items-center justify-center active:scale-95 transition-all min-h-[120rpx]">
@@ -123,7 +157,10 @@ export default function Home() {
       {/* Tasks List */}
       <View className="px-1">
          <View className="grid grid-cols-1 gap-3">
-            {tasks.map(task => {
+            {/* 根据当前 Tab 显示不同类型的任务 */}
+            {(activeTab === 'daily' ? dailyTasks : monthlyTasks).map(task => {
+              if (task.type === 'daily') {
+                // 每日任务卡片
                 const dailyLimit = task.dailyLimit || 1;
                 const completedCount = task.completedCount || 0;
                 const isFullyCompleted = completedCount >= dailyLimit;
@@ -134,7 +171,7 @@ export default function Home() {
                         onClick={() => handleTaskClick(task.id, task.title)}
                         className={classNames(
                             "relative overflow-hidden bg-white p-6 rounded-3xl shadow-sm border border-indigo-50 transition-all active:scale-98 min-h-[160rpx]",
-                            { "opacity-80": isFullyCompleted }
+                            { "opacity-60": isFullyCompleted }
                         )}
                     >
                         {isFullyCompleted && (
@@ -164,7 +201,117 @@ export default function Home() {
                         </View>
                     </View>
                 );
+              } else {
+                // 月度任务卡片
+                const progress = task.monthlyProgress || 0;
+                const target = task.targetDays || 20;
+                const bonus = task.bonusReward || 10;
+                const percentage = Math.min(100, (progress / target) * 100);
+                const isAchieved = progress >= target;
+
+                return (
+                    <View 
+                        key={task.id}
+                        onClick={() => {
+                          if (isAchieved) {
+                            // TODO: 领取奖励逻辑
+                          } else {
+                            toggleMonthlyTask(task.id);
+                          }
+                        }}
+                        className={classNames(
+                          "relative overflow-hidden bg-white p-6 rounded-3xl shadow-sm transition-all active:scale-98",
+                          isAchieved ? "border-2 border-yellow-400" : "border border-indigo-50"
+                        )}
+                    >
+                        {/* 流光效果 - 达成目标时 */}
+                        {isAchieved && (
+                          <View className="absolute inset-0 bg-gradient-to-r from-yellow-200/20 via-orange-200/20 to-yellow-200/20 animate-pulse"></View>
+                        )}
+                        
+                        <View className="relative z-10">
+                            {/* 标题和图标 */}
+                            <View className="flex justify-between items-start mb-4">
+                                <View className="flex items-center gap-3">
+                                    <View className="w-12 h-12 bg-gradient-to-br from-emerald-50 to-cyan-50 rounded-2xl flex items-center justify-center text-3xl shadow-sm">
+                                        <Text>{task.icon}</Text>
+                                    </View>
+                                    <View>
+                                        <Text className="font-bold text-slate-800 text-base block">{task.title}</Text>
+                                        <Text className="text-xs text-slate-500">坚持 {progress}/{target} 天</Text>
+                                    </View>
+                                </View>
+                                
+                                {/* 进度显示 */}
+                                <View className="flex flex-col items-center justify-center">
+                                    <View className="relative w-14 h-14 flex items-center justify-center">
+                                        {/* 背景圆环 */}
+                                        <View className="absolute inset-0 rounded-full border-4 border-slate-200"></View>
+                                        {/* 进度文字 */}
+                                        <View className="relative z-10 flex flex-col items-center">
+                                            <Text className="text-lg font-bold text-emerald-600">{progress}</Text>
+                                            <Text className="text-xs text-slate-400">/{target}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+                            
+                            {/* 分段进度条 */}
+                            <View className="mb-4">
+                                <View className="flex gap-1 justify-center">
+                                    {Array.from({ length: Math.min(20, target) }).map((_, i) => (
+                                        <View 
+                                            key={i}
+                                            className={classNames(
+                                                "w-2 h-2 rounded-full transition-all",
+                                                i < progress ? "bg-emerald-500" : "bg-slate-200"
+                                            )}
+                                        />
+                                    ))}
+                                </View>
+                            </View>
+                            
+                            {/* 奖励信息 */}
+                            <View className="flex justify-between items-center">
+                                <View className="flex gap-2">
+                                    <View className="bg-gradient-to-r from-emerald-50 to-cyan-50 px-3 py-1 rounded-xl border border-emerald-100/50">
+                                        <Text className="text-xs text-emerald-600 font-bold">+{task.magnetReward} 磁贴/天</Text>
+                                    </View>
+                                    <View className="bg-gradient-to-r from-yellow-50 to-orange-50 px-3 py-1 rounded-xl border border-yellow-100/50">
+                                        <Text className="text-xs text-yellow-700 font-bold">🎁 {bonus} 大奖</Text>
+                                    </View>
+                                </View>
+                                
+                                {/* 按钮状态 */}
+                                {isAchieved ? (
+                                    <View className="bg-gradient-to-r from-yellow-400 to-orange-500 px-4 py-2 rounded-full shadow-md">
+                                        <Text className="text-white font-bold text-sm">领取大奖 🎁</Text>
+                                    </View>
+                                ) : (
+                                    <View className="bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 rounded-full shadow-md">
+                                        <Text className="text-white font-bold text-sm">今日打卡</Text>
+                                    </View>
+                                )}
+                            </View>
+                        </View>
+                    </View>
+                );
+              }
             })}
+            
+            {/* 空状态 */}
+            {((activeTab === 'daily' && dailyTasks.length === 0) || 
+              (activeTab === 'monthly' && monthlyTasks.length === 0)) && (
+              <View className="flex flex-col items-center justify-center py-12">
+                <Text className="text-6xl mb-4">🥳</Text>
+                <Text className="text-slate-800 font-bold text-lg mb-2">
+                  {activeTab === 'daily' ? '今日任务已清空' : '暂无月度任务'}
+                </Text>
+                <Text className="text-slate-500 text-sm">
+                  {activeTab === 'daily' ? '你是最棒的！' : '敬请期待更多挑战'}
+                </Text>
+              </View>
+            )}
          </View>
       </View>
 

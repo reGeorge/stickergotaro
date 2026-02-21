@@ -9,13 +9,20 @@ import { FeedbackService } from './feedback.service'
 // --- Interfaces (复用原项目) ---
 export interface Task {
   id: string;
+  type: 'daily' | 'monthly'; // 任务类型：每日任务或月度打卡
   title: string;
   icon: string;
-  magnetReward: number;
+  magnetReward: number; // 基础奖励磁贴数
   completed: boolean;
   lastCompletedDate: string;
   dailyLimit?: number; // 每日最多完成次数，默认为1
   completedCount?: number; // 当天已完成的次数
+  
+  // 月度任务特有字段
+  monthlyProgress?: number; // 本月已打卡天数
+  targetDays?: number; // 目标天数（如一个月打卡满 20 天）
+  bonusReward?: number; // 达成目标后的额外磁贴大奖
+  history?: string[]; // 记录打卡的日期数组 ['2026-02-01', '2026-02-03']
 }
 
 export interface Reward {
@@ -58,6 +65,11 @@ interface StoreState {
   toggleTask: (taskId: string) => void;
   checkDailyReset: () => void;
   deleteLog: (logId: string) => void;
+  updateLog: (logId: string, updates: Partial<Log>) => void;
+  
+  // 月度任务 Actions
+  toggleMonthlyTask: (taskId: string) => void;
+  checkMonthlyReset: () => void;
   
   // Admin Actions
   addTask: (title: string, icon: string, reward: number) => void;
@@ -82,11 +94,40 @@ const initialUser: User = {
 };
 
 const initialTasks: Task[] = [
-  { id: '1', title: '吃饭香香', icon: '🍚', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
-  { id: '2', title: '洗刷刷达人', icon: '🛁', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
-  { id: '3', title: '玩具回新家', icon: '🧸', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
-  { id: '4', title: '上学不迟到', icon: '🎒', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
-  { id: '5', title: '准时梦游记', icon: '🌙', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
+  // 每日任务
+  { id: '1', type: 'daily', title: '吃饭香香', icon: '🍚', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
+  { id: '2', type: 'daily', title: '洗刷刷达人', icon: '🛁', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
+  { id: '3', type: 'daily', title: '玩具回新家', icon: '🧸', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
+  { id: '4', type: 'daily', title: '上学不迟到', icon: '🎒', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
+  { id: '5', type: 'daily', title: '准时梦游记', icon: '🌙', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
+  
+  // 月度任务示例
+  { 
+    id: 'm1', 
+    type: 'monthly', 
+    title: '阅读小达人', 
+    icon: '📖', 
+    magnetReward: 1, 
+    completed: false, 
+    lastCompletedDate: '', 
+    monthlyProgress: 0, 
+    targetDays: 20, 
+    bonusReward: 10, 
+    history: [] 
+  },
+  { 
+    id: 'm2', 
+    type: 'monthly', 
+    title: '运动小健将', 
+    icon: '🏀', 
+    magnetReward: 1, 
+    completed: false, 
+    lastCompletedDate: '', 
+    monthlyProgress: 0, 
+    targetDays: 15, 
+    bonusReward: 8, 
+    history: [] 
+  },
 ];
 
 const initialRewards: Reward[] = [
@@ -224,14 +265,111 @@ export const useStore = create<StoreState>()(
 
       checkDailyReset: () => {
         const today = dayjs().format('YYYY-MM-DD');
+        
+        // 检查月度重置
+        get().checkMonthlyReset();
+        
         set(state => ({
           tasks: state.tasks.map(t => {
-            if (t.lastCompletedDate !== today) {
+            // 数据迁移：为旧任务添加 type 字段
+            if (!t.type) {
+              t.type = 'daily';
+            }
+            
+            // 每日任务重置
+            if (t.type === 'daily' && t.lastCompletedDate !== today) {
               return { ...t, completed: false, completedCount: 0 };
             }
+            
+            // 月度任务初始化
+            if (t.type === 'monthly') {
+              return {
+                ...t,
+                monthlyProgress: t.monthlyProgress || 0,
+                targetDays: t.targetDays || 20,
+                bonusReward: t.bonusReward || 10,
+                history: t.history || []
+              };
+            }
+            
             return t;
           })
         }));
+      },
+
+      // 月度任务打卡
+      toggleMonthlyTask: (taskId) => {
+        const today = dayjs().format('YYYY-MM-DD');
+        const state = get();
+        const task = state.tasks.find(t => t.id === taskId);
+
+        if (!task || task.type !== 'monthly') return;
+
+        // 检查今日是否已打卡
+        const history = task.history || [];
+        if (history.includes(today)) {
+          Taro.showToast({ title: '今日已打卡', icon: 'none' });
+          return;
+        }
+
+        // 更新打卡数据
+        const newHistory = [...history, today];
+        const newProgress = newHistory.length;
+        const targetDays = task.targetDays || 20;
+        const bonusReward = task.bonusReward || 10;
+
+        set(s => ({
+          tasks: s.tasks.map(t => t.id === taskId ? {
+            ...t,
+            history: newHistory,
+            monthlyProgress: newProgress,
+            lastCompletedDate: today
+          } : t)
+        }));
+
+        // 发放基础奖励
+        get().addMagnets(task.magnetReward, `月度打卡: ${task.title}`, 'earn');
+        Taro.vibrateShort({ type: 'light' });
+
+        // 检查是否达成目标
+        if (newProgress >= targetDays) {
+          setTimeout(() => {
+            get().addMagnets(bonusReward, `达成月度目标: ${task.title}`, 'bonus');
+            Taro.showModal({
+              title: '🎉 太棒了！',
+              content: `你坚持完成了 ${task.title} ${targetDays} 天！获得额外 ${bonusReward} 磁贴大奖！`,
+              showCancel: false,
+              confirmText: '继续加油'
+            });
+          }, 500);
+        }
+
+        // 触发打卡动画
+        FeedbackService.showTaskComplete(taskId, false);
+      },
+
+      // 月度任务重置
+      checkMonthlyReset: () => {
+        const currentMonth = dayjs().format('YYYY-MM');
+        const lastCheckInDate = get().user.lastCheckInDate;
+        const lastMonth = lastCheckInDate ? dayjs(lastCheckInDate).format('YYYY-MM') : null;
+
+        // 如果跨月了，重置月度任务进度
+        if (lastMonth && lastMonth !== currentMonth) {
+          set(state => ({
+            tasks: state.tasks.map(t => {
+              if (t.type === 'monthly') {
+                return {
+                  ...t,
+                  monthlyProgress: 0,
+                  history: [],
+                  completed: false
+                };
+              }
+              return t;
+            })
+          }));
+        }
       },
 
       // Admin
@@ -273,6 +411,12 @@ export const useStore = create<StoreState>()(
           // 其他情况只删除记录
           set(s => ({ logs: s.logs.filter(l => l.id !== logId) }));
         }
+      },
+
+      updateLog: (logId, updates) => {
+        set(s => ({
+          logs: s.logs.map(l => l.id === logId ? { ...l, ...updates } : l)
+        }));
       },
 
       importConfig: (type, data) => {
