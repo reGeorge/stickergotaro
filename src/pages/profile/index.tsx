@@ -11,7 +11,7 @@ const Textarea = TaroTextarea as any
 const Input = TaroInput as any
 
 export default function Profile() {
-  const { user, tasks, rewards, addTask, updateTask, deleteTask, addReward, updateReward, deleteReward, importConfig } = useStore()
+  const { user, tasks, rewards, addTask, updateTask, deleteTask, reorderTasks, addReward, updateReward, deleteReward, reorderRewards, importConfig } = useStore()
   
   const [mode, setMode] = useState<'view' | 'tasks' | 'rewards'>('view')
   const [showImport, setShowImport] = useState(false)
@@ -19,6 +19,9 @@ export default function Profile() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingTask, setEditingTask] = useState<Partial<Task> | null>(null)
   const [editingReward, setEditingReward] = useState<Partial<Reward> | null>(null)
+  
+  // 排序模式
+  const [isReorderMode, setIsReorderMode] = useState(false)
 
   // Gate Logic (Simulated)
   const checkGate = (target: 'tasks' | 'rewards') => {
@@ -79,26 +82,50 @@ export default function Profile() {
     }
     
     if (editingTask.id) {
+      // 更新已有任务
       updateTask(editingTask.id, editingTask)
       Taro.showToast({ title: '约定已生效！', icon: 'success' })
     } else {
-      // 添加新任务时，补充必要字段
-      const newTask = {
-        ...editingTask,
-        id: Date.now().toString(),
-        completed: false,
-        lastCompletedDate: '',
-        completedCount: 0,
-        ...(editingTask.type === 'monthly' ? {
-          monthlyProgress: 0,
-          history: []
-        } : {})
-      }
-      updateTask(newTask.id, newTask)
+      // 添加新任务
+      addTask(editingTask)
       Taro.showToast({ title: '约定已生效！', icon: 'success' })
     }
     setShowEditModal(false)
     setEditingTask(null)
+  }
+
+  // 删除任务确认
+  const handleDeleteTask = (taskId: string, taskTitle: string) => {
+    Taro.showModal({
+      title: '确认删除',
+      content: `确定要删除「${taskTitle}」吗？删除后无法恢复。`,
+      confirmText: '确定删除',
+      confirmColor: '#ef4444',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          deleteTask(taskId)
+          Taro.showToast({ title: '删除成功', icon: 'success' })
+        }
+      }
+    })
+  }
+
+  // 删除奖励确认
+  const handleDeleteReward = (rewardId: string, rewardTitle: string) => {
+    Taro.showModal({
+      title: '确认删除',
+      content: `确定要删除「${rewardTitle}」吗？删除后无法恢复。`,
+      confirmText: '确定删除',
+      confirmColor: '#ef4444',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          deleteReward(rewardId)
+          Taro.showToast({ title: '删除成功', icon: 'success' })
+        }
+      }
+    })
   }
 
   // Reward handlers
@@ -155,27 +182,85 @@ export default function Profile() {
         Taro.showToast({title: '格式错误', icon:'none'})
     }
   }
+  
+  // 排序功能
+  const moveTaskUp = (index: number) => {
+    if (index === 0) return;
+    const newTaskIds = [...tasks.map(t => t.id)];
+    [newTaskIds[index - 1], newTaskIds[index]] = [newTaskIds[index], newTaskIds[index - 1]];
+    reorderTasks(newTaskIds);
+  }
+  
+  const moveTaskDown = (index: number) => {
+    if (index === tasks.length - 1) return;
+    const newTaskIds = [...tasks.map(t => t.id)];
+    [newTaskIds[index], newTaskIds[index + 1]] = [newTaskIds[index + 1], newTaskIds[index]];
+    reorderTasks(newTaskIds);
+  }
+  
+  const moveRewardUp = (index: number) => {
+    if (index === 0) return;
+    const newRewardIds = [...rewards.map(r => r.id)];
+    [newRewardIds[index - 1], newRewardIds[index]] = [newRewardIds[index], newRewardIds[index - 1]];
+    reorderRewards(newRewardIds);
+  }
+  
+  const moveRewardDown = (index: number) => {
+    if (index === rewards.length - 1) return;
+    const newRewardIds = [...rewards.map(r => r.id)];
+    [newRewardIds[index], newRewardIds[index + 1]] = [newRewardIds[index + 1], newRewardIds[index]];
+    reorderRewards(newRewardIds);
+  }
 
   if (mode !== 'view') {
     return (
         <View className="min-h-screen bg-bg-gray p-4 font-sans pb-24">
             <View className="flex justify-between items-center mb-6">
-                <View className="flex items-center gap-2" onClick={() => setMode('view')}>
+                <View className="flex items-center gap-2" onClick={() => { setMode('view'); setIsReorderMode(false); }}>
                     <Text className="text-xl">←</Text>
                     <Text className="font-bold text-lg">返回</Text>
                 </View>
                 <View className="flex gap-2">
                     <Button size="mini" onClick={mode === 'tasks' ? openAddTask : openAddReward} className="text-xs bg-pink-500 text-white py-2">+ 添加</Button>
+                    <Button 
+                        size="mini" 
+                        onClick={() => setIsReorderMode(!isReorderMode)} 
+                        className={classNames("text-xs py-2", isReorderMode ? "bg-indigo-500 text-white" : "bg-white")}
+                    >
+                        {isReorderMode ? "完成排序" : "排序"}
+                    </Button>
                     <Button size="mini" onClick={() => setShowImport(true)} className="text-xs bg-white py-2">导入</Button>
                     <Button size="mini" onClick={() => handleExport(mode as any)} className="text-xs bg-blue-50 text-blue-500 py-2">导出</Button>
                 </View>
             </View>
 
             {mode === 'tasks' ? (
-                tasks.map(t => (
+                tasks.map((t, index) => (
                     <View key={t.id} className="bg-white p-4 rounded-xl mb-3">
                         <View className="flex justify-between items-center">
                             <View className="flex items-center flex-1">
+                                {isReorderMode && (
+                                    <View className="mr-3 flex flex-col gap-1">
+                                        <View 
+                                            onClick={() => moveTaskUp(index)}
+                                            className={classNames(
+                                                "w-6 h-6 rounded-full flex items-center justify-center text-xs",
+                                                index === 0 ? "bg-gray-100 text-gray-300" : "bg-indigo-50 text-indigo-500"
+                                            )}
+                                        >
+                                            <Text>↑</Text>
+                                        </View>
+                                        <View 
+                                            onClick={() => moveTaskDown(index)}
+                                            className={classNames(
+                                                "w-6 h-6 rounded-full flex items-center justify-center text-xs",
+                                                index === tasks.length - 1 ? "bg-gray-100 text-gray-300" : "bg-indigo-50 text-indigo-500"
+                                            )}
+                                        >
+                                            <Text>↓</Text>
+                                        </View>
+                                    </View>
+                                )}
                                 <Text className="text-2xl mr-3">{t.icon}</Text>
                                 <View className="flex-1">
                                     <View className="flex items-center gap-2 mb-1">
@@ -201,18 +286,42 @@ export default function Profile() {
                                     </View>
                                 </View>
                             </View>
-                            <View className="flex gap-2">
-                                <Button size="mini" onClick={() => openEditTask(t)} className="bg-blue-50 text-blue-500 m-0">编辑</Button>
-                                <Button size="mini" onClick={() => deleteTask(t.id)} className="bg-red-50 text-red-500 m-0">删除</Button>
-                            </View>
+                            {!isReorderMode && (
+                                <View className="flex gap-2">
+                                    <Button size="mini" onClick={() => openEditTask(t)} className="bg-blue-50 text-blue-500 m-0">编辑</Button>
+                                    <Button size="mini" onClick={() => handleDeleteTask(t.id, t.title)} className="bg-red-50 text-red-500 m-0">删除</Button>
+                                </View>
+                            )}
                         </View>
                     </View>
                 ))
             ) : (
-                rewards.map(r => (
+                rewards.map((r, index) => (
                     <View key={r.id} className="bg-white p-4 rounded-xl mb-3">
                         <View className="flex justify-between items-center">
                             <View className="flex items-center flex-1">
+                                {isReorderMode && (
+                                    <View className="mr-3 flex flex-col gap-1">
+                                        <View 
+                                            onClick={() => moveRewardUp(index)}
+                                            className={classNames(
+                                                "w-6 h-6 rounded-full flex items-center justify-center text-xs",
+                                                index === 0 ? "bg-gray-100 text-gray-300" : "bg-pink-50 text-pink-500"
+                                            )}
+                                        >
+                                            <Text>↑</Text>
+                                        </View>
+                                        <View 
+                                            onClick={() => moveRewardDown(index)}
+                                            className={classNames(
+                                                "w-6 h-6 rounded-full flex items-center justify-center text-xs",
+                                                index === rewards.length - 1 ? "bg-gray-100 text-gray-300" : "bg-pink-50 text-pink-500"
+                                            )}
+                                        >
+                                            <Text>↓</Text>
+                                        </View>
+                                    </View>
+                                )}
                                 <Text className="text-2xl mr-3">{r.icon}</Text>
                                 <View className="flex-1">
                                     <Text className="font-bold text-gray-800 block">{r.title}</Text>
@@ -225,10 +334,12 @@ export default function Profile() {
                                     </View>
                                 </View>
                             </View>
-                            <View className="flex gap-2">
-                                <Button size="mini" onClick={() => openEditReward(r)} className="bg-blue-50 text-blue-500 m-0">编辑</Button>
-                                <Button size="mini" onClick={() => deleteReward(r.id)} className="bg-red-50 text-red-500 m-0">删除</Button>
-                            </View>
+                            {!isReorderMode && (
+                                <View className="flex gap-2">
+                                    <Button size="mini" onClick={() => openEditReward(r)} className="bg-blue-50 text-blue-500 m-0">编辑</Button>
+                                    <Button size="mini" onClick={() => handleDeleteReward(r.id, r.title)} className="bg-red-50 text-red-500 m-0">删除</Button>
+                                </View>
+                            )}
                         </View>
                     </View>
                 ))

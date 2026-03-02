@@ -78,38 +78,6 @@ export default function Home() {
       {/* 全屏反馈动画层 */}
       <RewardAnimation />
       
-      {/* Stats Card */}
-      <View className="bg-gradient-to-br from-pink-400 via-rose-400 to-purple-400 rounded-3xl p-6 text-white shadow-xl shadow-pink-200 relative overflow-hidden mb-6">
-        <View className="flex justify-between items-start mb-8 relative z-10">
-             {/* 左侧：购物车图标 */}
-             <View
-                onClick={() => setShowMagnets(true)}
-                className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md shadow-inner border border-white/20 active:scale-95 transition-all shrink-0"
-             >
-                <Text className="text-3xl">🛒</Text>
-             </View>
-             
-             {/* 右侧：问候文字 */}
-             <View className="flex-1 text-right">
-                <Text className="text-white/90 text-base mb-3 block font-semibold tracking-wide">你好, {user.name}! 👋</Text>
-                <Text className="text-pink-100 text-sm leading-relaxed">今天也要加油收集磁贴哦！</Text>
-             </View>
-        </View>
-
-        <View className="bg-black/10 rounded-2xl p-5 backdrop-blur-md border border-white/10 relative z-10">
-             <View className="flex justify-between items-center mb-3">
-                <Text className="text-sm font-bold text-white/90 tracking-wide">每日约定场景</Text>
-                <Text className="text-sm font-bold text-pink-100">{todaysProgress.completed} / {todaysProgress.total}</Text>
-             </View>
-             <View className="h-3 bg-black/20 rounded-full overflow-hidden">
-                <View 
-                  className="h-full bg-gradient-to-r from-yellow-300 to-amber-400 shadow-glow transition-all duration-500 ease-out" 
-                  style={{ width: `${todaysProgress.percentage}%` }}
-                ></View>
-             </View>
-        </View>
-      </View>
-
       {/* Tab Switcher - 滑动胶囊设计 */}
       <View className="px-1 mb-6">
         <View className="bg-white/30 backdrop-blur-md rounded-full p-1.5 flex border border-white/50 shadow-lg">
@@ -208,6 +176,11 @@ export default function Home() {
                 const bonus = task.bonusReward || 10;
                 const percentage = Math.min(100, (progress / target) * 100);
                 const isAchieved = progress >= target;
+                
+                // 检查今日是否已打卡
+                const today = new Date().toISOString().split('T')[0];
+                const history = task.history || [];
+                const isTodayChecked = history.includes(today);
 
                 return (
                     <View 
@@ -215,13 +188,14 @@ export default function Home() {
                         onClick={() => {
                           if (isAchieved) {
                             // TODO: 领取奖励逻辑
-                          } else {
+                          } else if (!isTodayChecked) {
                             toggleMonthlyTask(task.id);
                           }
                         }}
                         className={classNames(
-                          "relative overflow-hidden bg-white p-6 rounded-3xl shadow-sm transition-all active:scale-98",
-                          isAchieved ? "border-2 border-yellow-400" : "border border-indigo-50"
+                          "relative overflow-hidden bg-white p-6 rounded-3xl shadow-sm transition-all",
+                          isAchieved ? "border-2 border-yellow-400" : "border border-indigo-50",
+                          !isAchieved && !isTodayChecked && "active:scale-98"
                         )}
                     >
                         {/* 流光效果 - 达成目标时 */}
@@ -242,14 +216,25 @@ export default function Home() {
                                     </View>
                                 </View>
                                 
-                                {/* 进度显示 */}
-                                <View className="flex flex-col items-center justify-center">
-                                    <View className="relative w-14 h-14 flex items-center justify-center">
-                                        {/* 背景圆环 */}
-                                        <View className="absolute inset-0 rounded-full border-4 border-slate-200"></View>
-                                        {/* 进度文字 */}
-                                        <View className="relative z-10 flex flex-col items-center">
-                                            <Text className="text-lg font-bold text-emerald-600">{progress}</Text>
+                                {/* 圆形进度条 */}
+                                <View className="relative w-14 h-14">
+                                    {/* 背景圆环 */}
+                                    <View className="absolute inset-0 rounded-full border-4 border-slate-200"></View>
+                                    
+                                    {/* 进度圆环 - 使用多个 div 模拟圆环进度 */}
+                                    {percentage > 0 && (
+                                      <View 
+                                        className="absolute inset-0 rounded-full border-4 border-emerald-500 transition-all duration-500"
+                                        style={{
+                                          clipPath: `polygon(50% 50%, 50% 0%, ${50 + 50 * Math.sin(percentage * 2 * Math.PI / 100)}% ${50 - 50 * Math.cos(percentage * 2 * Math.PI / 100)}%, 50% 50%)`
+                                        }}
+                                      ></View>
+                                    )}
+                                    
+                                    {/* 进度文字 */}
+                                    <View className="absolute inset-0 flex items-center justify-center">
+                                        <View className="flex flex-col items-center">
+                                            <Text className="text-sm font-bold text-emerald-600">{progress}</Text>
                                             <Text className="text-xs text-slate-400">/{target}</Text>
                                         </View>
                                     </View>
@@ -286,6 +271,10 @@ export default function Home() {
                                 {isAchieved ? (
                                     <View className="bg-gradient-to-r from-yellow-400 to-orange-500 px-4 py-2 rounded-full shadow-md">
                                         <Text className="text-white font-bold text-sm">领取大奖 🎁</Text>
+                                    </View>
+                                ) : isTodayChecked ? (
+                                    <View className="bg-slate-100 px-4 py-2 rounded-full">
+                                        <Text className="text-slate-400 font-bold text-sm">今日已打卡 ✓</Text>
                                     </View>
                                 ) : (
                                     <View className="bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 rounded-full shadow-md">

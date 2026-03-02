@@ -72,15 +72,17 @@ interface StoreState {
   checkMonthlyReset: () => void;
   
   // Admin Actions
-  addTask: (title: string, icon: string, reward: number) => void;
+  addTask: (task: Partial<Task>) => void;
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
+  reorderTasks: (taskIds: string[]) => void;
   addReward: (title: string, icon: string, cost: number, desc: string) => void;
   updateReward: (id: string, updates: Partial<Reward>) => void;
   deleteReward: (id: string) => void;
+  reorderRewards: (rewardIds: string[]) => void;
   
   // Import
-  importConfig: (type: 'tasks' | 'rewards', data: any[]) => void;
+  importConfig: (type: 'tasks' | 'rewards' | 'logs', data: any[]) => void;
 }
 
 // --- Initial Data ---
@@ -373,13 +375,41 @@ export const useStore = create<StoreState>()(
       },
 
       // Admin
-      addTask: (title, icon, reward) => set(s => ({
-        tasks: [...s.tasks, { id: Date.now().toString(), title, icon, magnetReward: reward, completed: false, lastCompletedDate: '' }]
+      addTask: (task) => set(s => ({
+        tasks: [...s.tasks, {
+          id: Date.now().toString(),
+          title: task.title || '新任务',
+          icon: task.icon || '⭐',
+          type: task.type || 'daily',
+          magnetReward: task.magnetReward || 1,
+          completed: false,
+          lastCompletedDate: '',
+          completedCount: 0,
+          dailyLimit: task.dailyLimit || 1,
+          // 月度任务特有字段
+          ...(task.type === 'monthly' ? {
+            monthlyProgress: 0,
+            targetDays: task.targetDays || 20,
+            bonusReward: task.bonusReward || 10,
+            history: []
+          } : {}),
+          ...task
+        }]
       })),
       updateTask: (id, updates) => set(s => ({
         tasks: s.tasks.map(t => t.id === id ? { ...t, ...updates } : t)
       })),
+      
       deleteTask: (id) => set(s => ({ tasks: s.tasks.filter(t => t.id !== id) })),
+      
+      reorderTasks: (taskIds) => {
+        const state = get();
+        const taskMap = new Map(state.tasks.map(t => [t.id, t]));
+        const reorderedTasks = taskIds
+          .map(id => taskMap.get(id))
+          .filter((t): t is Task => t !== undefined);
+        set({ tasks: reorderedTasks });
+      },
       
       addReward: (title, icon, cost, description) => set(s => ({
         rewards: [...s.rewards, { id: Date.now().toString(), title, icon, cost, description, category: 'small' }]
@@ -388,6 +418,15 @@ export const useStore = create<StoreState>()(
         rewards: s.rewards.map(r => r.id === id ? { ...r, ...updates } : r)
       })),
       deleteReward: (id) => set(s => ({ rewards: s.rewards.filter(r => r.id !== id) })),
+      
+      reorderRewards: (rewardIds) => {
+        const state = get();
+        const rewardMap = new Map(state.rewards.map(r => [r.id, r]));
+        const reorderedRewards = rewardIds
+          .map(id => rewardMap.get(id))
+          .filter((r): r is Reward => r !== undefined);
+        set({ rewards: reorderedRewards });
+      },
       
       deleteLog: (logId) => {
         const state = get();
@@ -422,6 +461,7 @@ export const useStore = create<StoreState>()(
       importConfig: (type, data) => {
         if (type === 'tasks') set({ tasks: data });
         if (type === 'rewards') set({ rewards: data });
+        if (type === 'logs') set({ logs: data });
       }
     }),
     {

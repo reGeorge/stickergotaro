@@ -11,7 +11,7 @@ const Input = TaroInput as any
 const Textarea = TaroTextarea as any
 
 export default function Moments() {
-  const { logs, deleteLog, updateLog } = useStore()
+  const { logs, deleteLog, updateLog, importConfig } = useStore()
   
   // 编辑状态
   const [showEditModal, setShowEditModal] = useState(false)
@@ -84,12 +84,84 @@ export default function Moments() {
     Taro.setClipboardData({ data: text })
   }
 
+  const handleImport = () => {
+    Taro.showActionSheet({
+      itemList: ['从剪贴板导入'],
+      success: () => {
+        Taro.getClipboardData({
+          success: (res) => {
+            const text = res.data
+            if (!text || !text.includes('##')) {
+              Taro.showToast({ title: '格式错误', icon: 'none' })
+              return
+            }
+
+            try {
+              const lines = text.split('\n')
+              const newLogs: Log[] = []
+              let currentDate = dayjs() // 默认今天
+
+              // 解析日期映射
+              const parseDateHeader = (header: string): dayjs.Dayjs | null => {
+                const today = dayjs()
+                if (header.includes('今天')) return today
+                if (header.includes('昨天')) return today.subtract(1, 'day')
+                if (header.includes('前天')) return today.subtract(2, 'day')
+                // 匹配 MM月DD日 格式
+                const match = header.match(/(\d{1,2})月(\d{1,2})日/)
+                if (match) {
+                  return dayjs().month(parseInt(match[1]) - 1).date(parseInt(match[2]))
+                }
+                return null
+              }
+
+              for (const line of lines) {
+                const trimmed = line.trim()
+                // 日期行 ## 02月22日
+                if (trimmed.startsWith('## ')) {
+                  const date = parseDateHeader(trimmed.replace('## ', ''))
+                  if (date) currentDate = date
+                  continue
+                }
+                // 内容行 - 内容 (+数字)
+                const itemMatch = trimmed.match(/^- (.+) \((\+?\d+)\)$/)
+                if (itemMatch) {
+                  const description = itemMatch[1]
+                  const amount = parseInt(itemMatch[2])
+                  newLogs.push({
+                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                    type: 'magnet-moment',
+                    amount,
+                    description: `磁贴时刻: ${description}`,
+                    timestamp: currentDate.valueOf()
+                  })
+                }
+              }
+
+              if (newLogs.length > 0) {
+                importConfig('logs', newLogs)
+                Taro.showToast({ title: `导入 ${newLogs.length} 条记录！`, icon: 'success' })
+              } else {
+                Taro.showToast({ title: '未解析到记录', icon: 'none' })
+              }
+            } catch (e) {
+              Taro.showToast({ title: '解析失败', icon: 'none' })
+            }
+          }
+        })
+      }
+    })
+  }
+
   return (
     <View className="min-h-screen bg-bg-pink font-sans pb-24">
         {/* Header */}
         <View className="sticky top-0 z-20 bg-bg-pink/95 backdrop-blur-sm px-6 py-4 shadow-sm border-b border-pink-100 flex items-center justify-between">
             <Text className="text-xl font-bold text-gray-800">📸 美好时光</Text>
             <View className="flex items-center gap-2">
+                <View className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-bold active:bg-green-200" onClick={handleImport}>
+                    <Text>📥 导入</Text>
+                </View>
                 <View className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-xs font-bold active:bg-pink-200" onClick={copyMoments}>
                     <Text>📋 导出</Text>
                 </View>
