@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { useStore, Log } from '../../store/useStore'
 import dayjs from 'dayjs'
 import Taro from '@tarojs/taro'
+import { getMatchingBadge } from '../../config/badges.config'
 
 const View = TaroView as any
 const Text = TaroText as any
@@ -159,25 +160,25 @@ export default function Moments() {
         <View className="sticky top-0 z-20 bg-bg-pink/95 backdrop-blur-sm px-6 py-4 shadow-sm border-b border-pink-100 flex items-center justify-between">
             <Text className="text-xl font-bold text-gray-800">📸 美好时光</Text>
             <View className="flex items-center gap-2">
-                <View className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-bold active:bg-green-200" onClick={handleImport}>
-                    <Text>📥 导入</Text>
+                <View className="bg-white text-slate-600 px-4 py-1.5 rounded-full text-xs font-medium active:scale-95 shadow-sm border border-slate-100 transition-all flex items-center justify-center" onClick={handleImport}>
+                    <Text>导入</Text>
                 </View>
-                <View className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-xs font-bold active:bg-pink-200" onClick={copyMoments}>
-                    <Text>📋 导出</Text>
+                <View className="bg-indigo-50 text-indigo-500 px-4 py-1.5 rounded-full text-xs font-medium active:scale-95 shadow-sm border border-indigo-100 transition-all flex items-center justify-center" onClick={copyMoments}>
+                    <Text>导出</Text>
                 </View>
             </View>
         </View>
 
         <View className="p-6 relative">
-            {/* 时间轴垂直线条 - 自适应高度 */}
-            <View className="absolute left-10 top-8 bottom-0 w-0.5 bg-gradient-to-b from-pink-200 via-pink-100 to-transparent"></View>
+            {/* 时间轴垂直线条 - 自适应高度 (立体化阴影) */}
+            <View className="absolute left-10 top-8 bottom-0 w-1 bg-gradient-to-b from-pink-300 via-pink-200 to-transparent rounded-full shadow-[inset_1px_1px_3px_rgba(0,0,0,0.1)]"></View>
 
             {moments.map(group => (
                 <View key={group.date} className="mb-10 relative">
                     {/* 日期分组标题 */}
                     <View className="flex items-center mb-6 relative z-10">
-                        <View className="w-8 h-8 rounded-full bg-pink-100 border-2 border-white shadow-sm flex items-center justify-center text-xs font-bold text-pink-500 ml-6 mr-4">📅</View>
-                        <Text className="text-sm font-bold text-gray-500 bg-white/60 px-3 py-1 rounded-full">{group.display}</Text>
+                        <View className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-100 to-pink-200 border-2 border-white shadow-[0_4px_8px_rgba(244,114,182,0.3)] flex items-center justify-center text-sm font-bold text-pink-500 ml-5 mr-4 transform -translate-x-[2px]">📅</View>
+                        <Text className="text-sm font-bold text-slate-600 bg-white px-4 py-1.5 rounded-full shadow-sm border border-slate-50">{group.display}</Text>
                     </View>
                     
                     {/* 条目容器 - 增加左侧padding以对齐时间轴 */}
@@ -185,17 +186,28 @@ export default function Moments() {
                         {group.items.map(m => (
                             <View key={m.id} className="relative pb-8 pl-6">
                                 {/* 时间轴小圆点 - 精准对齐气泡顶部 */}
-                                <View className="absolute left-0 top-3 w-3 h-3 rounded-full bg-pink-300 border-2 border-white shadow-sm z-10"></View>
+                                <View className="absolute left-[-2px] top-4 w-3.5 h-3.5 rounded-full bg-pink-400 border-2 border-white shadow-[0_2px_4px_rgba(244,114,182,0.4)] z-10"></View>
                                 
-                                {/* 气泡卡片 - 优化留白和圆角 */}
-                                <View className="bg-white p-4 rounded-3xl shadow-sm border border-pink-50">
+                                {/* 左侧三角小箭头指示 */}
+                                <View className="absolute left-4 top-4 w-0 h-0 border-t-[8px] border-t-transparent border-r-[10px] border-r-white border-b-[8px] border-b-transparent z-10 drop-shadow-sm"></View>
+
+                                {/* 气泡卡片 - 立体感阴影 3D */}
+                                <View className="bg-gradient-to-br from-white to-pink-50/30 p-5 rounded-3xl shadow-[0_8px_20px_-4px_rgba(244,114,182,0.15),inset_0__2px_4px_rgba(255,255,255,1)] border border-white relative z-0">
                                     {/* 内容区域 */}
-                                    <Text className="text-gray-800 text-sm leading-relaxed font-medium block mb-3">
-                                        {m.description.replace('磁贴时刻: ', '')}
-                                    </Text>
+                                    <View className="flex justify-between items-start mb-3">
+                                        <Text className="text-slate-800 text-sm leading-relaxed font-bold block drop-shadow-sm flex-1">
+                                            {m.description.replace('磁贴时刻: ', '')}
+                                        </Text>
+                                        {/* 勋章微标 */}
+                                        {getMatchingBadge(m.description) && (
+                                            <View className={`ml-2 px-2 py-0.5 rounded-full bg-gradient-to-r ${getMatchingBadge(m.description)!.bgGradient} border border-white/50 shadow-sm flex items-center justify-center shrink-0`}>
+                                                <Text className="text-sm">{getMatchingBadge(m.description)!.icon}</Text>
+                                            </View>
+                                        )}
+                                    </View>
                                     
                                     {/* 底部操作栏 */}
-                                    <View className="flex items-center justify-between pt-3 border-t border-pink-50">
+                                    <View className="flex items-center justify-between pt-3 border-t border-pink-100/50">
                                         {/* 左侧：时间 */}
                                         <Text className="text-xs text-gray-400">{dayjs(m.timestamp).format('HH:mm')}</Text>
                                         

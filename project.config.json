@@ -2,7 +2,7 @@
 {
   "miniprogramRoot": "dist/",
   "projectname": "sticker-go-taro",
-  "description": "磁贴大挑战",
+  "description": "磁贴成长纪",
   "appid": "touristappid",
   "setting": {
     "urlCheck": true,

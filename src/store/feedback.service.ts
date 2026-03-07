@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
+import { soundService } from '../utils/sound'
 import { getTaskAnimation, getHomeRunAnimation, getRedeemAnimation, LottieAnimationConfig } from './lottie.config'
 
 export interface FeedbackState {
@@ -70,6 +71,7 @@ export class FeedbackService {
   static showRedeemSuccess() {
     // 触发震动
     Taro.vibrateShort({ type: 'medium' })
+    soundService.playFanfare()
     
     // 显示动画
     useFeedbackStore.getState().showRedeemFeedback()

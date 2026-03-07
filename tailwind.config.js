@@ -57,11 +57,26 @@ module.exports = {
         'spin-slow': 'spin 8s linear infinite',
         'suck-in': 'suckIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards',
         'gift-open': 'giftOpen 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.3s',
+        'fade-in': 'fadeIn 0.4s ease-out forwards',
+        'progress': 'progress 1.25s linear forwards',
+        'magnet-bounce': 'magnetBounce var(--mdur, 1.2s) var(--mdel, 0s) infinite',
       },
       keyframes: {
+        magnetBounce: {
+          '0%, 100%': { transform: 'translateY(0)', animationTimingFunction: 'cubic-bezier(0.8, 0, 1, 1)' },
+          '50%': { transform: 'translateY(-15px)', animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)' },
+        },
         popIn: {
           '0%': { opacity: '0', transform: 'scale(0.5)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        progress: {
+          '0%': { width: '0%' },
+          '100%': { width: '100%' },
         },
         float: {
           '0%, 100%': { transform: 'translateY(0)' },

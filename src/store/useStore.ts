@@ -17,6 +17,7 @@ export interface Task {
   lastCompletedDate: string;
   dailyLimit?: number; // 每日最多完成次数，默认为1
   completedCount?: number; // 当天已完成的次数
+  isActive?: boolean; // Phase 2: In current daily draft pool
   
   // 月度任务特有字段
   monthlyProgress?: number; // 本月已打卡天数
@@ -31,7 +32,9 @@ export interface Reward {
   icon: string;
   cost: number;
   description: string;
-  category: 'mini' | 'small' | 'bonus' | 'dream';
+  category: 'mini' | 'small' | 'bonus' | 'dream' | 'experience';
+  type?: 'goods' | 'experience'; // 体验类 / 物品类
+  currencyType?: 'magnet' | 'starToken'; // 新增货币类型：普通磁贴 / 许愿星
   dailyLimit?: number; // 每日最多兑换次数，默认为1
   redeemedCount?: number; // 当天已兑换的次数
 }
@@ -42,15 +45,20 @@ export interface Log {
   amount: number;
   description: string;
   timestamp: number;
+  emotion?: 'happy' | 'normal' | 'sad'; // 记录当时的情绪反思
 }
 
 export interface User {
   name: string;
+  avatar?: string;
   magnets: number;
+  starTokens: number; // 高阶奖励碎片
   streak: number;
   lastCheckInDate: string;
   totalTasksCompleted: number;
   homeRuns: number;
+  unlockedBadges: string[]; // Store unlocked badge IDs
+  claimedMilestones: string[]; // 记录已领取的里程碑，避免重复领取 (如 "2026-w10")
 }
 
 interface StoreState {
@@ -60,15 +68,20 @@ interface StoreState {
   logs: Log[];
   
   // Actions
-  addMagnets: (amount: number, description: string, type: Log['type']) => void;
+  updateProfile: (name: string, avatar: string) => void;
+  addMagnets: (amount: number, description: string, type: Log['type'], emotion?: Log['emotion']) => void;
   spendMagnets: (amount: number, description: string) => boolean;
-  toggleTask: (taskId: string) => void;
+  spendStarTokens: (amount: number, description: string) => boolean; // 花费许愿星
+  addStarTokens: (amount: number, description: string) => void; // 增加许愿星
+  claimMilestone: (milestoneId: string, tokenReward: number) => void; // 领取里程碑奖励
+  toggleTask: (taskId: string, emotion?: Log['emotion']) => void;
+  toggleTaskActive: (taskId: string) => void;
   checkDailyReset: () => void;
   deleteLog: (logId: string) => void;
   updateLog: (logId: string, updates: Partial<Log>) => void;
   
   // 月度任务 Actions
-  toggleMonthlyTask: (taskId: string) => void;
+  toggleMonthlyTask: (taskId: string, emotion?: Log['emotion']) => void;
   checkMonthlyReset: () => void;
   
   // Admin Actions
@@ -76,7 +89,7 @@ interface StoreState {
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   reorderTasks: (taskIds: string[]) => void;
-  addReward: (title: string, icon: string, cost: number, desc: string) => void;
+  addReward: (title: string, icon: string, cost: number, desc: string, type?: 'goods' | 'experience') => void;
   updateReward: (id: string, updates: Partial<Reward>) => void;
   deleteReward: (id: string) => void;
   reorderRewards: (rewardIds: string[]) => void;
@@ -88,20 +101,26 @@ interface StoreState {
 // --- Initial Data ---
 const initialUser: User = {
   name: '宝贝',
+  avatar: '�',
   magnets: 0,
+  starTokens: 0,
   streak: 0,
   lastCheckInDate: '',
   totalTasksCompleted: 0,
-  homeRuns: 0
+  homeRuns: 0,
+  unlockedBadges: ['badge-courage'], // TODO: Just giving one by default so we can see the unlocked styling
+  claimedMilestones: []
 };
 
 const initialTasks: Task[] = [
   // 每日任务
-  { id: '1', type: 'daily', title: '吃饭香香', icon: '🍚', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
-  { id: '2', type: 'daily', title: '洗刷刷达人', icon: '🛁', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
-  { id: '3', type: 'daily', title: '玩具回新家', icon: '🧸', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
-  { id: '4', type: 'daily', title: '上学不迟到', icon: '🎒', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
-  { id: '5', type: 'daily', title: '准时梦游记', icon: '🌙', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0 },
+  { id: '1', type: 'daily', title: '吃饭香香', icon: '🍚', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0, isActive: true },
+  { id: '2', type: 'daily', title: '洗刷刷达人', icon: '🛁', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0, isActive: true },
+  { id: '3', type: 'daily', title: '玩具回新家', icon: '🧸', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0, isActive: true },
+  { id: '4', type: 'daily', title: '上学不迟到', icon: '🎒', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0, isActive: false }, // Let's make some false by default so the user can choose them
+  { id: '5', type: 'daily', title: '准时梦游记', icon: '🌙', magnetReward: 1, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0, isActive: false },
+  { id: '6', type: 'daily', title: '每日阅读', icon: '📚', magnetReward: 2, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0, isActive: false },
+  { id: '7', type: 'daily', title: '运动小健将', icon: '🏃', magnetReward: 2, completed: false, lastCompletedDate: '', dailyLimit: 1, completedCount: 0, isActive: false },
   
   // 月度任务示例
   { 
@@ -133,10 +152,12 @@ const initialTasks: Task[] = [
 ];
 
 const initialRewards: Reward[] = [
-  { id: 'r1', title: '玩一会手机', icon: '📱', cost: 2, description: 'mini奖励 (15分钟)', category: 'mini', dailyLimit: 1, redeemedCount: 0 },
-  { id: 'r2', title: '玩一会游戏', icon: '🎮', cost: 3, description: '小奖励 (30分钟)', category: 'small', dailyLimit: 1, redeemedCount: 0 },
-  { id: 'r3', title: '美味零食', icon: '🍫', cost: 5, description: '小奖赏 (10元以内)', category: 'bonus', dailyLimit: 1, redeemedCount: 0 },
-  { id: 'r4', title: '心仪玩具', icon: '🎁', cost: 10, description: '大梦想 (50元以内)', category: 'dream', dailyLimit: 1, redeemedCount: 0 },
+  { id: 'r1', title: '玩一会手机', icon: '📱', cost: 2, description: 'mini奖励 (15分钟)', category: 'mini', type: 'goods', currencyType: 'magnet', dailyLimit: 1, redeemedCount: 0 },
+  { id: 'r2', title: '美味零食', icon: '🍫', cost: 5, description: '小奖赏 (10元以内)', category: 'bonus', type: 'goods', currencyType: 'magnet', dailyLimit: 1, redeemedCount: 0 },
+  { id: 'r3', title: '睡前多讲一个故事', icon: '📖', cost: 3, description: '亲子体验', category: 'experience', type: 'experience', currencyType: 'magnet', dailyLimit: 1, redeemedCount: 0 },
+  { id: 'r4', title: '选周末大餐', icon: '🍽️', cost: 8, description: '家庭决定权', category: 'small', type: 'experience', currencyType: 'magnet', dailyLimit: 1, redeemedCount: 0 },
+  { id: 'r5', title: '心仪大玩具', icon: '🎁', cost: 80, description: '积攒磁贴换大奖', category: 'dream', type: 'goods', currencyType: 'magnet', dailyLimit: 1, redeemedCount: 0 },
+  { id: 'r6', title: '游乐园一日游', icon: '🎢', cost: 100, description: '积攒磁贴换大奖', category: 'dream', type: 'experience', currencyType: 'magnet', dailyLimit: 1, redeemedCount: 0 },
 ];
 
 export const useStore = create<StoreState>()(
@@ -147,7 +168,13 @@ export const useStore = create<StoreState>()(
       rewards: initialRewards,
       logs: [],
 
-      addMagnets: (amount, description, type) => {
+      updateProfile: (name, avatar) => {
+        set(state => ({
+          user: { ...state.user, name, avatar }
+        }));
+      },
+
+      addMagnets: (amount, description, type, emotion) => {
         set(state => ({
           user: { ...state.user, magnets: state.user.magnets + amount },
           logs: [{
@@ -155,7 +182,8 @@ export const useStore = create<StoreState>()(
             type,
             amount,
             description,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            emotion
           }, ...state.logs]
         }));
         
@@ -185,11 +213,64 @@ export const useStore = create<StoreState>()(
         }));
         
         Taro.vibrateShort({ type: 'light' });
-        soundService.playSpend();
+        // Sound is now handled by FeedbackService.showRedeemSuccess()
         return true;
       },
 
-      toggleTask: (taskId) => {
+      spendStarTokens: (amount, description) => {
+        const state = get();
+        if ((state.user.starTokens || 0) < amount) return false;
+        
+        set(state => ({
+          user: { ...state.user, starTokens: (state.user.starTokens || 0) - amount },
+          logs: [{
+            id: Date.now().toString(),
+            type: 'spend',
+            amount: -amount,
+            description,
+            timestamp: Date.now()
+          }, ...state.logs]
+        }));
+        return true;
+      },
+
+      addStarTokens: (amount, description) => {
+        set(state => ({
+          user: { ...state.user, starTokens: (state.user.starTokens || 0) + amount },
+          logs: [{
+            id: Date.now().toString(),
+            type: 'bonus',
+            amount: 0, // This is basically a non-magnet log, but you can track it via text.
+            description,
+            timestamp: Date.now()
+          }, ...state.logs]
+        }));
+      },
+
+      claimMilestone: (milestoneId, tokenReward) => {
+        const state = get();
+        // Prevent duplicate claims
+        if (state.user.claimedMilestones?.includes(milestoneId)) return;
+
+        set(state => ({
+          user: { 
+            ...state.user, 
+            starTokens: (state.user.starTokens || 0) + tokenReward,
+            claimedMilestones: [...(state.user.claimedMilestones || []), milestoneId]
+          },
+          logs: [{
+            id: Date.now().toString(),
+            type: 'bonus',
+            amount: tokenReward,
+            description: `达到里程碑 ${milestoneId}，获得许愿星！`,
+            timestamp: Date.now()
+          }, ...state.logs]
+        }));
+        Taro.vibrateLong();
+        soundService.playFanfare();
+      },
+
+      toggleTask: (taskId, emotion) => {
         const today = dayjs().format('YYYY-MM-DD');
         const state = get();
         const task = state.tasks.find(t => t.id === taskId);
@@ -219,8 +300,11 @@ export const useStore = create<StoreState>()(
           } : t)
         }));
         
-        // 2. 添加奖励
-        get().addMagnets(task.magnetReward, `完成约定: ${task.title}`, 'earn');
+        // 2. 添加奖励 (15%几率触发暴击)
+        const isCrit = Math.random() < 0.15;
+        const rewardAmount = isCrit ? task.magnetReward * 2 : task.magnetReward;
+        const rewardDesc = isCrit ? `🎉 暴击双倍！完成约定: ${task.title}` : `完成约定: ${task.title}`;
+        get().addMagnets(rewardAmount, rewardDesc, 'earn', emotion);
         Taro.vibrateShort({ type: 'light' });
 
         // 3. 更新连续打卡逻辑
@@ -265,6 +349,14 @@ export const useStore = create<StoreState>()(
         }
       },
 
+      toggleTaskActive: (taskId: string) => {
+        set(state => ({
+          tasks: state.tasks.map(t => 
+            t.id === taskId ? { ...t, isActive: !t.isActive } : t
+          )
+        }));
+      },
+
       checkDailyReset: () => {
         const today = dayjs().format('YYYY-MM-DD');
         
@@ -300,7 +392,7 @@ export const useStore = create<StoreState>()(
       },
 
       // 月度任务打卡
-      toggleMonthlyTask: (taskId) => {
+      toggleMonthlyTask: (taskId, emotion) => {
         const today = dayjs().format('YYYY-MM-DD');
         const state = get();
         const task = state.tasks.find(t => t.id === taskId);
@@ -329,8 +421,11 @@ export const useStore = create<StoreState>()(
           } : t)
         }));
 
-        // 发放基础奖励
-        get().addMagnets(task.magnetReward, `月度打卡: ${task.title}`, 'earn');
+        // 发放基础奖励 (15%几率暴击)
+        const isCrit = Math.random() < 0.15;
+        const rewardAmount = isCrit ? task.magnetReward * 2 : task.magnetReward;
+        const rewardDesc = isCrit ? `🎉 暴击双倍！月度打卡: ${task.title}` : `月度打卡: ${task.title}`;
+        get().addMagnets(rewardAmount, rewardDesc, 'earn', emotion);
         Taro.vibrateShort({ type: 'light' });
 
         // 检查是否达成目标
@@ -411,8 +506,8 @@ export const useStore = create<StoreState>()(
         set({ tasks: reorderedTasks });
       },
       
-      addReward: (title, icon, cost, description) => set(s => ({
-        rewards: [...s.rewards, { id: Date.now().toString(), title, icon, cost, description, category: 'small' }]
+      addReward: (title, icon, cost, description, type = 'goods') => set(s => ({
+        rewards: [...s.rewards, { id: Date.now().toString(), title, icon, cost, description, category: 'small', type, currencyType: 'magnet' }]
       })),
       updateReward: (id, updates) => set(s => ({
         rewards: s.rewards.map(r => r.id === id ? { ...r, ...updates } : r)

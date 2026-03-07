@@ -2,7 +2,7 @@
   "name": "sticker-go-taro",
   "version": "1.0.0",
   "private": true,
-  "description": "磁贴大挑战小程序版",
+  "description": "磁贴成长纪小程序版",
   "templateInfo": {
     "name": "default",
     "typescript": true,
@@ -30,6 +30,7 @@
     "@tarojs/taro": "3.6.35",
     "classnames": "^2.3.2",
     "dayjs": "^1.11.10",
+    "framer-motion": "^12.35.0",
     "lottie-miniprogram": "^1.0.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

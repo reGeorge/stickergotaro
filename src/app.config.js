@@ -8,7 +8,7 @@ module.exports = {
   window: {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#eff6ff',
-    navigationBarTitleText: '磁贴大作战',
+    navigationBarTitleText: '磁贴成长纪',
     navigationBarTextStyle: 'black',
     backgroundColor: '#eff6ff'
   },
