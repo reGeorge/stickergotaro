@@ -401,13 +401,13 @@ export default function Profile() {
 
             {/* Edit Task Modal */}
             {showEditModal && editingTask && (
-                <View className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-50" onClick={() => { setShowEditModal(false); setEditingTask(null); }}>
-                    <View className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl max-h-[80vh] overflow-y-scroll" onClick={(e) => e.stopPropagation()}>
-                        <Text className="text-lg font-bold mb-4 block">{editingTask.id ? '编辑约定' : '添加约定'}</Text>
+                <View className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 md:p-12 z-50 overflow-y-auto" onClick={() => { setShowEditModal(false); setEditingTask(null); }}>
+                    <View className="bg-white w-full max-w-sm md:max-w-lg rounded-3xl p-6 md:p-10 shadow-2xl max-h-[90vh] overflow-y-auto box-border" onClick={(e) => e.stopPropagation()}>
+                        <Text className="text-lg md:text-2xl font-bold mb-4 block">{editingTask.id ? '编辑约定' : '添加约定'}</Text>
 
                         {/* 任务类型选择 */}
                         <View className="mb-4">
-                            <Text className="text-xs font-bold text-slate-500 mb-2 block">约定类型</Text>
+                            <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">约定类型</Text>
                             <View className="flex gap-2">
                                 <View 
                                     onClick={() => setEditingTask({ ...editingTask, type: 'daily', dailyLimit: 1 })}
@@ -418,7 +418,7 @@ export default function Profile() {
                                             : "bg-slate-50 border-slate-200"
                                     )}
                                 >
-                                    <Text className={editingTask.type === 'daily' ? "text-blue-600 font-bold" : "text-slate-400"}>
+                                    <Text className={editingTask.type === 'daily' ? "text-blue-600 font-bold md:text-lg" : "text-slate-400 md:text-lg"}>
                                         ⚡ 每日任务
                                     </Text>
                                 </View>
@@ -431,7 +431,7 @@ export default function Profile() {
                                             : "bg-slate-50 border-slate-200"
                                     )}
                                 >
-                                    <Text className={editingTask.type === 'monthly' ? "text-emerald-600 font-bold" : "text-slate-400"}>
+                                    <Text className={editingTask.type === 'monthly' ? "text-emerald-600 font-bold md:text-lg" : "text-slate-400 md:text-lg"}>
                                         🏆 月度打卡
                                     </Text>
                                 </View>
@@ -439,9 +439,9 @@ export default function Profile() {
                         </View>
 
                         <View className="mb-4">
-                            <Text className="text-xs font-bold text-slate-500 mb-2 block">任务图标</Text>
+                            <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">任务图标</Text>
                             <Input 
-                                className="w-full bg-slate-50 rounded-xl p-3 text-sm"
+                                className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-sm md:text-lg"
                                 value={editingTask.icon}
                                 onInput={(e) => setEditingTask({ ...editingTask, icon: e.detail.value })}
                                 placeholder="输入emoji图标"
@@ -449,9 +449,9 @@ export default function Profile() {
                         </View>
                         
                         <View className="mb-4">
-                            <Text className="text-xs font-bold text-slate-500 mb-2 block">任务名称</Text>
+                            <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">任务名称</Text>
                             <Input 
-                                className="w-full bg-slate-50 rounded-xl p-3 text-sm"
+                                className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-sm md:text-lg"
                                 value={editingTask.title}
                                 onInput={(e) => setEditingTask({ ...editingTask, title: e.detail.value })}
                                 placeholder="例如：吃饭香香"
@@ -459,12 +459,12 @@ export default function Profile() {
                         </View>
                         
                         <View className="mb-4">
-                            <Text className="text-xs font-bold text-slate-500 mb-2 block">
+                            <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">
                                 {editingTask.type === 'daily' ? '磁贴奖励（每次）' : '磁贴奖励（每天）'}
                             </Text>
                             <Input 
                                 type="number"
-                                className="w-full bg-slate-50 rounded-xl p-3 text-sm"
+                                className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-sm md:text-lg"
                                 value={editingTask.magnetReward !== undefined ? String(editingTask.magnetReward) : ''}
                                 onInput={(e) => {
                                   const val = e.detail.value
@@ -477,10 +477,10 @@ export default function Profile() {
                         {/* 每日任务特有字段 */}
                         {editingTask.type === 'daily' && (
                             <View className="mb-6">
-                                <Text className="text-xs font-bold text-slate-500 mb-2 block">每日最多完成次数</Text>
+                                <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">每日最多完成次数</Text>
                                 <Input 
                                     type="number"
-                                    className="w-full bg-slate-50 rounded-xl p-3 text-sm"
+                                    className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-sm md:text-lg"
                                     value={editingTask.dailyLimit !== undefined ? String(editingTask.dailyLimit) : ''}
                                     onInput={(e) => {
                                       const val = e.detail.value
@@ -495,10 +495,10 @@ export default function Profile() {
                         {editingTask.type === 'monthly' && (
                             <>
                                 <View className="mb-4">
-                                    <Text className="text-xs font-bold text-slate-500 mb-2 block">目标天数</Text>
+                                    <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">目标天数</Text>
                                     <Input 
                                         type="number"
-                                        className="w-full bg-slate-50 rounded-xl p-3 text-sm"
+                                        className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-sm md:text-lg"
                                         value={editingTask.targetDays !== undefined ? String(editingTask.targetDays) : ''}
                                         onInput={(e) => {
                                           const val = e.detail.value
@@ -509,10 +509,10 @@ export default function Profile() {
                                 </View>
                                 
                                 <View className="mb-6">
-                                    <Text className="text-xs font-bold text-slate-500 mb-2 block">达成奖励（额外磁贴）</Text>
+                                    <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">达成奖励（额外磁贴）</Text>
                                     <Input 
                                         type="number"
-                                        className="w-full bg-slate-50 rounded-xl p-3 text-sm"
+                                        className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-sm md:text-lg"
                                         value={editingTask.bonusReward !== undefined ? String(editingTask.bonusReward) : ''}
                                         onInput={(e) => {
                                           const val = e.detail.value
@@ -524,21 +524,21 @@ export default function Profile() {
                             </>
                         )}
                         
-                        <Button onClick={saveTask} className="w-full bg-pink-500 text-white rounded-xl font-bold py-3">保存约定</Button>
+                        <Button onClick={saveTask} className="w-full bg-pink-500 text-white rounded-xl font-bold py-3 md:py-4 md:text-xl shadow-lg active:scale-95">保存约定</Button>
                     </View>
                 </View>
             )}
 
             {/* Edit Reward Modal */}
             {showEditModal && editingReward && (
-                <View className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-50" onClick={() => { setShowEditModal(false); setEditingReward(null); }}>
-                    <View className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-                        <Text className="text-lg font-bold mb-4 block">{editingReward.id ? '编辑奖励' : '添加奖励'}</Text>
+                <View className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 md:p-12 z-50 overflow-y-auto" onClick={() => { setShowEditModal(false); setEditingReward(null); }}>
+                    <View className="bg-white w-full max-w-sm md:max-w-lg rounded-3xl p-6 md:p-10 shadow-2xl max-h-[90vh] overflow-y-auto box-border" onClick={(e) => e.stopPropagation()}>
+                        <Text className="text-lg md:text-2xl font-bold mb-4 block">{editingReward.id ? '编辑奖励' : '添加奖励'}</Text>
 
                         <View className="mb-4">
-                            <Text className="text-xs font-bold text-slate-500 mb-2 block">奖励图标</Text>
+                            <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">奖励图标</Text>
                             <Input 
-                                className="w-full bg-slate-50 rounded-xl p-3 text-sm"
+                                className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-sm md:text-lg"
                                 value={editingReward.icon}
                                 onInput={(e) => setEditingReward({ ...editingReward, icon: e.detail.value })}
                                 placeholder="输入emoji图标"
@@ -546,9 +546,9 @@ export default function Profile() {
                         </View>
                         
                         <View className="mb-4">
-                            <Text className="text-xs font-bold text-slate-500 mb-2 block">奖励名称</Text>
+                            <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">奖励名称</Text>
                             <Input 
-                                className="w-full bg-slate-50 rounded-xl p-3 text-sm"
+                                className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-sm md:text-lg"
                                 value={editingReward.title}
                                 onInput={(e) => setEditingReward({ ...editingReward, title: e.detail.value })}
                                 placeholder="例如：玩一会手机"
@@ -556,10 +556,10 @@ export default function Profile() {
                         </View>
                         
                         <View className="mb-4">
-                            <Text className="text-xs font-bold text-slate-500 mb-2 block">磁贴花费</Text>
+                            <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">磁贴花费</Text>
                             <Input 
                                 type="number"
-                                className="w-full bg-slate-50 rounded-xl p-3 text-sm"
+                                className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-sm md:text-lg"
                                 value={editingReward.cost !== undefined ? String(editingReward.cost) : ''}
                                 onInput={(e) => {
                                   const val = e.detail.value
@@ -570,9 +570,9 @@ export default function Profile() {
                         </View>
                         
                         <View className="mb-6">
-                            <Text className="text-xs font-bold text-slate-500 mb-2 block">奖励描述</Text>
+                            <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">奖励描述</Text>
                             <Input
-                                className="w-full bg-slate-50 rounded-xl p-3 text-sm"
+                                className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-sm md:text-lg"
                                 value={editingReward.description}
                                 onInput={(e) => setEditingReward({ ...editingReward, description: e.detail.value })}
                                 placeholder="例如：15分钟"
@@ -580,10 +580,10 @@ export default function Profile() {
                         </View>
 
                         <View className="mb-6">
-                            <Text className="text-xs font-bold text-slate-500 mb-2 block">每日最多兑换次数</Text>
+                            <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">每日最多兑换次数</Text>
                             <Input
                                 type="number"
-                                className="w-full bg-slate-50 rounded-xl p-3 text-sm"
+                                className="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-sm md:text-lg"
                                 value={editingReward.dailyLimit !== undefined ? String(editingReward.dailyLimit) : ''}
                                 onInput={(e) => {
                                   const val = e.detail.value
@@ -594,18 +594,18 @@ export default function Profile() {
                         </View>
 
                         <View className="mb-6">
-                            <Text className="text-xs font-bold text-slate-500 mb-2 block">奖励类型</Text>
+                            <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">奖励类型</Text>
                             <View className="flex gap-2">
                                 <View 
                                     onClick={() => setEditingReward({ ...editingReward, type: 'goods' })}
-                                    className={classNames("flex-1 py-2 px-3 rounded-xl border text-center text-sm font-bold transition-all", 
+                                    className={classNames("flex-1 py-2 md:py-3 px-3 rounded-xl border text-center text-sm md:text-lg font-bold transition-all", 
                                         editingReward.type !== 'experience' ? "bg-indigo-50 border-indigo-200 text-indigo-600" : "bg-white border-slate-200 text-slate-400")}
                                 >
                                     🎁 物品类
                                 </View>
                                 <View 
                                     onClick={() => setEditingReward({ ...editingReward, type: 'experience' })}
-                                    className={classNames("flex-1 py-2 px-3 rounded-xl border text-center text-sm font-bold transition-all", 
+                                    className={classNames("flex-1 py-2 md:py-3 px-3 rounded-xl border text-center text-sm md:text-lg font-bold transition-all", 
                                         editingReward.type === 'experience' ? "bg-pink-50 border-pink-200 text-pink-600" : "bg-white border-slate-200 text-slate-400")}
                                 >
                                     🎈 体验类
@@ -613,7 +613,7 @@ export default function Profile() {
                             </View>
                         </View>
 
-                        <Button onClick={saveReward} className="w-full bg-pink-500 text-white rounded-xl font-bold py-3">保存</Button>
+                        <Button onClick={saveReward} className="w-full bg-pink-500 text-white rounded-xl font-bold py-3 md:py-4 md:text-xl shadow-lg active:scale-95">保存</Button>
                     </View>
                 </View>
             )}
@@ -726,28 +726,28 @@ export default function Profile() {
       />
 
       {isEditingProfile && (
-        <View className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-6" onClick={() => setIsEditingProfile(false)}>
-            <View className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl max-h-[85vh] overflow-y-auto box-border" onClick={e => e.stopPropagation()}>
-                <Text className="text-lg font-bold mb-4 block text-center">编辑主角档案</Text>
+        <View className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-6 md:p-12" onClick={() => setIsEditingProfile(false)}>
+            <View className="bg-white w-full max-w-sm md:max-w-md rounded-3xl p-6 md:p-10 shadow-2xl max-h-[85vh] overflow-y-auto box-border" onClick={e => e.stopPropagation()}>
+                <Text className="text-lg md:text-2xl font-bold mb-4 block text-center">编辑主角档案</Text>
                 
-                <Text className="text-xs font-bold text-slate-500 mb-2 block">选择头像</Text>
-                <View className="flex flex-wrap gap-3 mb-6 justify-center bg-slate-50 border border-slate-100 p-4 rounded-2xl">
+                <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">选择头像</Text>
+                <View className="flex flex-wrap gap-3 md:gap-4 mb-6 justify-center bg-slate-50 border border-slate-100 p-4 rounded-2xl">
                     {avatars.map(a => (
-                        <View key={a} onClick={() => setTempAvatar(a)} className={classNames("w-12 h-12 flex items-center justify-center text-2xl rounded-full transition-all border-2", tempAvatar === a ? "bg-white border-indigo-400 shadow-sm scale-110" : "bg-transparent border-transparent select-none")}>
+                        <View key={a} onClick={() => setTempAvatar(a)} className={classNames("w-12 h-12 md:w-16 md:h-16 flex items-center justify-center text-2xl md:text-4xl rounded-full transition-all border-2", tempAvatar === a ? "bg-white border-indigo-400 shadow-sm scale-110" : "bg-transparent border-transparent select-none")}>
                             <Text>{a}</Text>
                         </View>
                     ))}
                 </View>
                 
-                <Text className="text-xs font-bold text-slate-500 mb-2 block">宝贝名字</Text>
+                <Text className="text-xs md:text-base font-bold text-slate-500 mb-2 block">宝贝名字</Text>
                 <Input 
                      value={tempName} 
                      onInput={e => setTempName(e.detail.value)} 
-                     className="bg-slate-50 border border-slate-200 py-3 px-4 rounded-xl mb-6 w-full box-border font-bold text-center"
+                     className="bg-slate-50 border border-slate-200 py-3 md:py-5 px-4 rounded-xl mb-6 w-full box-border font-bold text-center md:text-2xl h-auto"
                      placeholder="请输入宝贝的名字"
                 />
-                <Button onClick={() => { updateProfile(tempName, tempAvatar); setIsEditingProfile(false); }} className="w-full box-border bg-slate-900 text-white font-bold rounded-xl py-4 shadow-lg active:scale-95 transition-all">
-                    保存档案
+                <Button onClick={() => { updateProfile(tempName, tempAvatar); setIsEditingProfile(false); }} className="w-full box-border bg-slate-900 text-white font-bold rounded-xl py-4 md:py-6 md:text-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center">
+                    <Text>保存档案</Text>
                 </Button>
             </View>
         </View>
