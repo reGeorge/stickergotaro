@@ -10,7 +10,12 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.venv-xiaogpt-local
+data/
+*.pid
 *.local
+__pycache__/
+*.pyc
 
 # Editor directories and files
 .vscode/*

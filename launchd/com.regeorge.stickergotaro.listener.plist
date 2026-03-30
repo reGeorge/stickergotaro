@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.regeorge.stickergotaro.listener</string>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Users/regeorge/Documents/codeStore/stickergotaro/.venv-xiaogpt-local/bin/python</string>
+      <string>/Users/regeorge/Documents/codeStore/stickergotaro/scripts/xiaogpt_markdown_logger.py</string>
+      <string>--hardware</string>
+      <string>L05B</string>
+      <string>--mi-did</string>
+      <string>2116704058</string>
+      <string>--output-dir</string>
+      <string>data/raw</string>
+      <string>--record-only</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/regeorge/Documents/codeStore/stickergotaro</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/regeorge/Documents/codeStore/stickergotaro/data/logs/xiaogpt-listener.stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/regeorge/Documents/codeStore/stickergotaro/data/logs/xiaogpt-listener.stderr.log</string>
+  </dict>
+</plist>

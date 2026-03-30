@@ -85,71 +85,108 @@ export default function Moments() {
     Taro.setClipboardData({ data: text })
   }
 
-  const handleImport = () => {
-    Taro.showActionSheet({
-      itemList: ['从剪贴板导入'],
-      success: () => {
-        Taro.getClipboardData({
-          success: (res) => {
-            const text = res.data
-            if (!text || !text.includes('##')) {
-              Taro.showToast({ title: '格式错误', icon: 'none' })
+  const normalizeImportedLogs = (items: any[]): Log[] => {
+    return items
+      .filter(item => item && typeof item === 'object')
+      .map((item, index) => ({
+        id: String(item.id || `${Date.now()}-${index}-${Math.random().toString(36).slice(2, 8)}`),
+        type: item.type === 'earn' ? 'earn' : 'magnet-moment',
+        amount: Math.max(1, Number(item.amount || 1)),
+        description:
+          item.type === 'earn'
+            ? String(item.description || '完成约定: 未命名任务')
+            : String(item.description || '磁贴时刻: 未命名记录'),
+        timestamp: Number(item.timestamp || Date.now())
+      }))
+  }
+
+  const parseMarkdownMoments = (text: string): Log[] => {
+    const lines = text.split('\n')
+    const newLogs: Log[] = []
+    let currentDate = dayjs()
+
+    const parseDateHeader = (header: string): dayjs.Dayjs | null => {
+      const today = dayjs()
+      if (header.includes('今天')) return today
+      if (header.includes('昨天')) return today.subtract(1, 'day')
+      if (header.includes('前天')) return today.subtract(2, 'day')
+      const match = header.match(/(\d{1,2})月(\d{1,2})日/)
+      if (match) {
+        return dayjs().month(parseInt(match[1]) - 1).date(parseInt(match[2]))
+      }
+      return null
+    }
+
+    for (const line of lines) {
+      const trimmed = line.trim()
+      if (trimmed.startsWith('## ')) {
+        const date = parseDateHeader(trimmed.replace('## ', ''))
+        if (date) currentDate = date
+        continue
+      }
+      const itemMatch = trimmed.match(/^- (.+) \((\+?\d+)\)$/)
+      if (itemMatch) {
+        const description = itemMatch[1]
+        const amount = parseInt(itemMatch[2])
+        newLogs.push({
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+          type: 'magnet-moment',
+          amount,
+          description: `磁贴时刻: ${description}`,
+          timestamp: currentDate.valueOf()
+        })
+      }
+    }
+    return newLogs
+  }
+
+  const importFromClipboard = (mode: 'markdown' | 'json') => {
+    Taro.getClipboardData({
+      success: (res) => {
+        const text = (res.data || '').trim()
+        if (!text) {
+          Taro.showToast({ title: '剪贴板为空', icon: 'none' })
+          return
+        }
+
+        try {
+          let newLogs: Log[] = []
+          if (mode === 'json') {
+            const parsed = JSON.parse(text)
+            if (!Array.isArray(parsed)) {
+              throw new Error('JSON_NOT_ARRAY')
+            }
+            newLogs = normalizeImportedLogs(parsed)
+          } else {
+            if (!text.includes('##')) {
+              Taro.showToast({ title: 'Markdown 格式错误', icon: 'none' })
               return
             }
-
-            try {
-              const lines = text.split('\n')
-              const newLogs: Log[] = []
-              let currentDate = dayjs() // 默认今天
-
-              // 解析日期映射
-              const parseDateHeader = (header: string): dayjs.Dayjs | null => {
-                const today = dayjs()
-                if (header.includes('今天')) return today
-                if (header.includes('昨天')) return today.subtract(1, 'day')
-                if (header.includes('前天')) return today.subtract(2, 'day')
-                // 匹配 MM月DD日 格式
-                const match = header.match(/(\d{1,2})月(\d{1,2})日/)
-                if (match) {
-                  return dayjs().month(parseInt(match[1]) - 1).date(parseInt(match[2]))
-                }
-                return null
-              }
-
-              for (const line of lines) {
-                const trimmed = line.trim()
-                // 日期行 ## 02月22日
-                if (trimmed.startsWith('## ')) {
-                  const date = parseDateHeader(trimmed.replace('## ', ''))
-                  if (date) currentDate = date
-                  continue
-                }
-                // 内容行 - 内容 (+数字)
-                const itemMatch = trimmed.match(/^- (.+) \((\+?\d+)\)$/)
-                if (itemMatch) {
-                  const description = itemMatch[1]
-                  const amount = parseInt(itemMatch[2])
-                  newLogs.push({
-                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-                    type: 'magnet-moment',
-                    amount,
-                    description: `磁贴时刻: ${description}`,
-                    timestamp: currentDate.valueOf()
-                  })
-                }
-              }
-
-              if (newLogs.length > 0) {
-                importConfig('logs', newLogs)
-                Taro.showToast({ title: `导入 ${newLogs.length} 条记录！`, icon: 'success' })
-              } else {
-                Taro.showToast({ title: '未解析到记录', icon: 'none' })
-              }
-            } catch (e) {
-              Taro.showToast({ title: '解析失败', icon: 'none' })
-            }
+            newLogs = parseMarkdownMoments(text)
           }
-        })
+
+          if (newLogs.length > 0) {
+            importConfig('logs', newLogs)
+            Taro.showToast({ title: `导入 ${newLogs.length} 条记录！`, icon: 'success' })
+          } else {
+            Taro.showToast({ title: '未解析到记录', icon: 'none' })
+          }
+        } catch (e) {
+          Taro.showToast({ title: mode === 'json' ? 'JSON 解析失败' : '解析失败', icon: 'none' })
+        }
+      }
+    })
+  }
+
+  const handleImport = () => {
+    Taro.showActionSheet({
+      itemList: ['导入 Markdown 剪贴板', '导入 logs.json 剪贴板'],
+      success: (res) => {
+        if (res.tapIndex === 1) {
+          importFromClipboard('json')
+          return
+        }
+        importFromClipboard('markdown')
       }
     })
   }

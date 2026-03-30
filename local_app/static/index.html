@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小满本地数据台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Local AI Journal</p>
+          <h1>小满本地数据台</h1>
+          <p class="lede">查看原始语音记录、提取结果，以及对齐到小程序的日志数据。</p>
+        </div>
+        <button id="refreshButton" class="refresh">刷新数据</button>
+      </section>
+
+      <section class="stats" id="stats"></section>
+
+      <section class="panel quick-links">
+        <div class="panel-head">
+          <h2>报告视图</h2>
+          <span class="pill">截图友好</span>
+        </div>
+        <div class="link-row">
+          <a class="report-link" href="/report/daily">日报</a>
+          <a class="report-link" href="/report/weekly">周报</a>
+          <a class="report-link" href="/report/monthly">月报</a>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>最近原始记录</h2>
+            <span id="rawCount" class="pill">0</span>
+          </div>
+          <div id="rawList" class="list"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>提取后记录</h2>
+            <span id="extractedCount" class="pill">0</span>
+          </div>
+          <div id="extractedList" class="list"></div>
+        </article>
+      </section>
+
+      <section class="panel wide">
+        <div class="panel-head">
+          <h2>Miniapp Logs</h2>
+          <span id="miniappCount" class="pill">0</span>
+        </div>
+        <pre id="miniappPreview" class="code"></pre>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+  </html>

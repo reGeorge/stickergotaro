@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小满报告页</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="report-body">
+    <main class="report-shell">
+      <nav class="report-nav">
+        <a href="/report/daily" id="navDaily" class="report-tab">日报</a>
+        <a href="/report/weekly" id="navWeekly" class="report-tab">周报</a>
+        <a href="/report/monthly" id="navMonthly" class="report-tab">月报</a>
+      </nav>
+
+      <section class="report-hero">
+        <div class="report-hero-copy">
+          <p class="eyebrow">Stable Report View</p>
+          <h1 id="reportTitle">小满报告</h1>
+          <p id="reportTagline" class="report-tagline"></p>
+          <p id="reportSummary" class="lede"></p>
+        </div>
+        <div class="report-meta">
+          <div class="report-chip" id="reportLabel"></div>
+          <div class="report-chip" id="reportCount"></div>
+          <div class="report-chip accent" id="reportMagnetTotal"></div>
+        </div>
+      </section>
+
+      <section class="grid report-grid">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>亮点</h2>
+            <span id="highlightCount" class="pill">0</span>
+          </div>
+          <div id="highlightList" class="list"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>时间线</h2>
+            <span id="itemCount" class="pill">0</span>
+          </div>
+          <div id="timelineList" class="timeline-list"></div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/report.js"></script>
+  </body>
+  </html>
