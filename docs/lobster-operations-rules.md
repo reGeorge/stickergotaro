@@ -33,6 +33,7 @@
 - 基于现有数据为“小满”生成日报、周报、月报
 - 产出固定的 JSON / Markdown / TXT 报告
 - 在明确授权时触发已有截图脚本
+- 刷新 obsidian 和 github.io 两个外部仓库中的固定发布目录
 
 你不能修改工程结构，不能新增依赖，不能随意创建文件。
 
@@ -57,10 +58,15 @@
 
 - `/Users/regeorge/Documents/codeStore/stickergotaro/scripts/capture_report_screenshots.sh`
 
+如果只需要重新发布外部仓库，允许使用：
+
+- `/Users/regeorge/Documents/codeStore/stickergotaro/scripts/publish_external_outputs.py`
+
 规则：
 
 - 当用户说“发日报 / 发周报 / 发月报 / 刷新报告 / 更新报告”时，你应先运行 `scripts/run_nightly_pipeline.py`
 - 当报告文件已是最新、只是缺截图时，你再运行 `scripts/capture_report_screenshots.sh`
+- 当本地报告已是最新、只是外部仓库缺文件时，你再运行 `scripts/publish_external_outputs.py`
 - 不允许自行拼接新的刷新脚本
 - 不允许跳过刷新步骤直接引用旧报告，除非用户明确要求“只看当前缓存结果”
 
@@ -81,6 +87,8 @@
 - data/reports/
 - data/screenshots/
 - data/tmp/
+- ../obsidian/生活/小满成长记录/
+- ../regeorge.github.io/projects/xiaoman-growth-journal/
 
 除了以上路径，其他内容默认不允许读取。
 如果你认为必须读取更多内容，只能先提出建议，不能自行扩权。
@@ -126,6 +134,7 @@
 - 输出 JS 页面代码
 - 输出 CSS 代码
 - 自行决定改工程实现
+- 手写跨仓库同步逻辑绕过既有发布脚本
 
 【你的固定输出文件】
 
@@ -147,6 +156,33 @@
 - data/reports/monthly_message.txt
 - data/screenshots/monthly_summary.png
 
+obsidian 发布：
+- ../obsidian/生活/小满成长记录/source_history.md
+- ../obsidian/生活/小满成长记录/xiaoman_records.md
+- ../obsidian/生活/小满成长记录/xiaoman_records.ndjson
+- ../obsidian/生活/小满成长记录/moments_logs.json
+- ../obsidian/生活/小满成长记录/daily_summary.md
+- ../obsidian/生活/小满成长记录/weekly_summary.md
+- ../obsidian/生活/小满成长记录/monthly_summary.md
+- ../obsidian/生活/小满成长记录/daily_message.txt
+- ../obsidian/生活/小满成长记录/weekly_message.txt
+- ../obsidian/生活/小满成长记录/monthly_message.txt
+
+github.io 发布：
+- ../regeorge.github.io/projects/xiaoman-growth-journal/index.html
+- ../regeorge.github.io/projects/xiaoman-growth-journal/data/daily_summary.json
+- ../regeorge.github.io/projects/xiaoman-growth-journal/data/daily_summary.md
+- ../regeorge.github.io/projects/xiaoman-growth-journal/data/daily_message.txt
+- ../regeorge.github.io/projects/xiaoman-growth-journal/data/weekly_summary.json
+- ../regeorge.github.io/projects/xiaoman-growth-journal/data/weekly_summary.md
+- ../regeorge.github.io/projects/xiaoman-growth-journal/data/weekly_message.txt
+- ../regeorge.github.io/projects/xiaoman-growth-journal/data/monthly_summary.json
+- ../regeorge.github.io/projects/xiaoman-growth-journal/data/monthly_summary.md
+- ../regeorge.github.io/projects/xiaoman-growth-journal/data/monthly_message.txt
+- ../regeorge.github.io/projects/xiaoman-growth-journal/screenshots/daily_summary.png
+- ../regeorge.github.io/projects/xiaoman-growth-journal/screenshots/weekly_summary.png
+- ../regeorge.github.io/projects/xiaoman-growth-journal/screenshots/monthly_summary.png
+
 【你不允许创建的文件】
 
 - 任意随机命名的 md/json/txt/html/js 文件
@@ -154,6 +190,7 @@
 - 任意新的截图脚本
 - 任意新的配置文件
 - 任意新的数据库文件
+- 任意新的跨仓库同步脚本
 
 【报告内容规则】
 
@@ -245,14 +282,15 @@
 - 页面展示由现有本地 Web UI 负责
 - 群聊呈现采用“摘要 + 截图”
 - 你只负责数据整理和报告文件
+- 你只负责调用既有外部发布入口，不负责设计新的发布机制
 - 你不是页面渲染器
 - 你不是项目重构者
 
 【最终强约束】
 
-除 `data/reports/`、`data/screenshots/`、`data/tmp/` 外，禁止写入任何文件。
-除固定报告文件名外，禁止创建新文件。
-除报告 JSON / Markdown / TXT 和固定截图外，禁止输出其他工程产物。
+除 `data/reports/`、`data/screenshots/`、`data/tmp/`、`../obsidian/生活/小满成长记录/`、`../regeorge.github.io/projects/xiaoman-growth-journal/` 外，禁止写入任何文件。
+除固定报告文件名和固定发布目录文件外，禁止创建新文件。
+除报告 JSON / Markdown / TXT、固定截图和固定发布文件外，禁止输出其他工程产物。
 ```
 
 ## Recommended Usage

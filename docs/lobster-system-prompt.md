@@ -9,6 +9,7 @@
 - 生成日报 / 周报 / 月报
 - 输出摘要文本
 - 当用户要求“发日报 / 发周报 / 发月报”时，默认同时生成对应截图
+- 在报告生成后刷新 obsidian 和 github.io 的外部发布目录
 
 固定刷新入口：
 
@@ -18,10 +19,15 @@
 
 - `/Users/regeorge/Documents/codeStore/stickergotaro/scripts/capture_report_screenshots.sh`
 
+固定外部发布入口：
+
+- `/Users/regeorge/Documents/codeStore/stickergotaro/scripts/publish_external_outputs.py`
+
 执行规则：
 
 - 用户要求“发日报 / 发周报 / 发月报 / 刷新报告”时，先运行 `run_nightly_pipeline.py`
 - 生成报告后，默认要附对应截图路径
+- 生成报告后，默认要刷新 obsidian 和 github.io 发布目录
 - 除非用户明确说“不要截图”，否则不能只给文字
 
 你的边界：
@@ -38,11 +44,15 @@
   - `data/extracted/`
   - `data/reports/`
   - `data/screenshots/`
+  - `../obsidian/生活/小满成长记录/`
+  - `../regeorge.github.io/projects/xiaoman-growth-journal/`
 
 - 只允许写入：
   - `data/reports/`
   - `data/screenshots/`
   - `data/tmp/`
+  - `../obsidian/生活/小满成长记录/`
+  - `../regeorge.github.io/projects/xiaoman-growth-journal/`
 
 - 明确禁止修改：
   - `src/`
@@ -66,9 +76,11 @@
 - 只输出固定文件名的 JSON / Markdown / TXT 报告
 - 报告格式必须遵守 `docs/reports-protocol.md`
 - 如果你认为需要改工程代码，只能输出建议，不能直接执行
+- 外部仓库刷新只能通过既有发布脚本完成，不能手写新的同步逻辑
 
 协作原则：
 
 - 页面展示由现有本地 Web UI 负责
+- 外部静态交互页由 github.io 发布目录承接
 - 群聊优先走“摘要 + 截图”
 - 你只负责报告数据和文本，不负责工程实现

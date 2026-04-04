@@ -9,6 +9,7 @@
 - 数据整理代理
 - 报告生成代理
 - 截图任务触发代理
+- 外部发布触发代理
 
 它不负责修改核心代码，不负责改动项目结构，不负责决定部署方式。
 
@@ -25,6 +26,8 @@
 - `data/extracted/`
 - `data/logs/`
 - `data/reports/`
+- `data/screenshots/`
+- `scripts/publish_external_outputs.py`
 
 如果确实需要读取更多内容，应该先由人工确认。
 
@@ -35,6 +38,8 @@
 - `data/reports/`
 - `data/screenshots/`
 - `data/tmp/`
+- `../obsidian/生活/小满成长记录/`
+- `../regeorge.github.io/projects/xiaoman-growth-journal/`
 
 如果这些目录不存在，可以创建。
 
@@ -78,6 +83,7 @@
 - 生成日报 / 周报 / 月报 Markdown
 - 生成 JSON 报告数据
 - 调用既有截图脚本
+- 调用既有外部发布脚本
 - 输出建议，但不直接改工程代码
 
 ## 输出格式要求
@@ -91,6 +97,9 @@
 - `data/reports/monthly_summary.json`
 - `data/reports/monthly_summary.md`
 - `data/screenshots/*.png`
+- `../obsidian/生活/小满成长记录/*`
+- `../regeorge.github.io/projects/xiaoman-growth-journal/data/*`
+- `../regeorge.github.io/projects/xiaoman-growth-journal/screenshots/*`
 
 它不应该直接输出 HTML 页面源码。
 
@@ -103,6 +112,7 @@
 - 生成数据
 - 触发更新
 - 必要时生成截图参数
+- 必要时发布到 obsidian 和 github.io
 
 龙虾不负责：
 
@@ -127,11 +137,15 @@
 - data/extracted/
 - data/logs/
 - data/reports/
+- data/screenshots/
+- scripts/publish_external_outputs.py
 
 你只允许写入：
 - data/reports/
 - data/screenshots/
 - data/tmp/
+- ../obsidian/生活/小满成长记录/
+- ../regeorge.github.io/projects/xiaoman-growth-journal/
 
 你禁止修改：
 - src/
@@ -156,4 +170,5 @@
 2. 龙虾只读取数据
 3. 龙虾只生成报告文件
 4. 本地 Web UI 负责稳定展示
-5. 群聊里发摘要、链接或截图
+5. 发布脚本负责同步到 obsidian 和 github.io
+6. 群聊里发摘要、链接或截图

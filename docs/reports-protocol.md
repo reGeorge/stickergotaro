@@ -1,6 +1,6 @@
 # Reports Protocol
 
-这份文档规定龙虾在 `data/reports/` 下的标准输出格式。
+这份文档规定龙虾在 `data/reports/` 下的标准输出格式，以及这些文件被发布到外部仓库时的目录约定。
 
 ## 目标
 
@@ -21,6 +21,39 @@ data/
     daily_summary.png
     weekly_summary.png
   tmp/
+```
+
+发布后的外部目录约定：
+
+```text
+../obsidian/生活/小满成长记录/
+  source_history.md
+  xiaoman_records.md
+  xiaoman_records.ndjson
+  moments_logs.json
+  daily_summary.md
+  weekly_summary.md
+  monthly_summary.md
+  daily_message.txt
+  weekly_message.txt
+  monthly_message.txt
+
+../regeorge.github.io/projects/xiaoman-growth-journal/
+  index.html
+  data/
+    daily_summary.json
+    daily_summary.md
+    daily_message.txt
+    weekly_summary.json
+    weekly_summary.md
+    weekly_message.txt
+    monthly_summary.json
+    monthly_summary.md
+    monthly_message.txt
+  screenshots/
+    daily_summary.png
+    weekly_summary.png
+    monthly_summary.png
 ```
 
 ## JSON 协议
@@ -126,3 +159,4 @@ data/
 - Web UI 读取 `data/reports/*.json` 或 `data/reports/*.md`
 - 群聊里优先发摘要文本
 - 如果需要视觉化展示，优先发截图，不直接发 HTML
+- 外部交互页读取 `../regeorge.github.io/projects/xiaoman-growth-journal/data/*`

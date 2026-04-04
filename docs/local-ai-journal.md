@@ -11,6 +11,8 @@ Primary data outputs:
 - `data/source_history.md`
 - `data/moments_logs.json`
 - `data/reports/*.json|*.md|*.txt`
+- `../obsidian/生活/小满成长记录/*`
+- `../regeorge.github.io/projects/xiaoman-growth-journal/*`
 
 ## 0. Host setup model
 
@@ -73,6 +75,11 @@ This creates:
 - `data/extracted/xiaoman_records.ndjson`
 - `data/extracted/xiaoman_records.md`
 
+Nightly publish also mirrors the cleaned records into:
+
+- `../obsidian/生活/小满成长记录/xiaoman_records.ndjson`
+- `../obsidian/生活/小满成长记录/xiaoman_records.md`
+
 The extracted output now aligns with the miniapp's existing log model:
 
 - task completion -> `aligned_log_type: earn`
@@ -110,6 +117,13 @@ cat data/moments_logs.json | pbcopy
 
 Then open the miniapp's `美好时光` page and choose `导入 logs.json 剪贴板`.
 
+Nightly publish also mirrors these cleaned outputs into the obsidian repo:
+
+- `../obsidian/生活/小满成长记录/moments_logs.json`
+- `../obsidian/生活/小满成长记录/source_history.md`
+- `../obsidian/生活/小满成长记录/*_summary.md`
+- `../obsidian/生活/小满成长记录/*_message.txt`
+
 ## 4. Suggested daily job
 
 Nightly script:
@@ -133,6 +147,12 @@ launchctl load ~/Library/LaunchAgents/com.regeorge.stickergotaro.xiaoman-nightly
 ```
 
 This will run every day at `23:00`.
+
+The nightly pipeline now has three layers of outputs:
+
+- local build cache stays in `stickergotaro/data/*`
+- cleaned journal artifacts are published to `../obsidian/生活/小满成长记录/`
+- report interaction assets are published to `../regeorge.github.io/projects/xiaoman-growth-journal/`
 
 ## 5. Listener auto-start
 
@@ -248,6 +268,12 @@ zsh scripts/capture_report_screenshots.sh
 ```
 
 This screenshot flow now uses `safaridriver` to capture the report pages themselves instead of grabbing a desktop area.
+
+After screenshots and reports are built, the publish step refreshes:
+
+- `../regeorge.github.io/projects/xiaoman-growth-journal/index.html`
+- `../regeorge.github.io/projects/xiaoman-growth-journal/data/*`
+- `../regeorge.github.io/projects/xiaoman-growth-journal/screenshots/*`
 
 Before the first run on this Mac, enable Safari remote automation once:
 

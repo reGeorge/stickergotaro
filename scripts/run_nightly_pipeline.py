@@ -59,6 +59,7 @@ def main() -> None:
     )
     run(str(ROOT / "scripts" / "capture_report_screenshots.py"), allow_failure=True)
     run(str(ROOT / "scripts" / "sync_sqlite.py"))
+    run(str(ROOT / "scripts" / "publish_external_outputs.py"))
 
 
 if __name__ == "__main__":

@@ -48,6 +48,13 @@
    │           │ data/extracted/              │        │ data/moments_logs.json        │
    │           │ xiaoman_records.ndjson/md    │        └──────────────────────────────┘
    │           └──────────────────────────────┘
+   │                                               │
+   │                                               ▼
+   │                                ┌──────────────────────────────┐
+   │                                │ 外部发布层                    │
+   │                                │ obsidian / github.io         │
+   │                                │ publish_external_outputs.py  │
+   │                                └──────────────────────────────┘
    │
    │
    │   浏览器访问
@@ -94,6 +101,13 @@
 - 当前重点对齐两类：
   - `earn`
   - `magnet-moment`
+
+### 4.5 外部发布层
+
+- `stickergotaro/data/*` 继续作为本地构建缓存
+- 清洗后的记录同步到 `../obsidian/生活/小满成长记录/`
+- 交互页、报告 JSON、摘要和截图同步到 `../regeorge.github.io/projects/xiaoman-growth-journal/`
+- 发布入口统一由 `scripts/publish_external_outputs.py` 负责
 
 ### 5. 本地后端 / Web UI
 
@@ -172,3 +186,12 @@
 - `data/screenshots/daily_summary.png`
 - `data/screenshots/weekly_summary.png`
 - `data/screenshots/monthly_summary.png`
+
+外部发布目标：
+
+- `../obsidian/生活/小满成长记录/source_history.md`
+- `../obsidian/生活/小满成长记录/xiaoman_records.md`
+- `../obsidian/生活/小满成长记录/moments_logs.json`
+- `../regeorge.github.io/projects/xiaoman-growth-journal/index.html`
+- `../regeorge.github.io/projects/xiaoman-growth-journal/data/*.json|*.md|*.txt`
+- `../regeorge.github.io/projects/xiaoman-growth-journal/screenshots/*.png`

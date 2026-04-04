@@ -31,3 +31,4 @@ cd "$ROOT"
 bash scripts/capture_report_screenshots.sh || true
 
 "$VENV/bin/python" scripts/sync_sqlite.py
+"$VENV/bin/python" scripts/publish_external_outputs.py
