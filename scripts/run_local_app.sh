@@ -1,7 +1,7 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="/Users/regeorge/Documents/codeStore/stickergotaro"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 exec python3 local_app/server.py

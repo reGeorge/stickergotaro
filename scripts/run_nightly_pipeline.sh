@@ -1,8 +1,8 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="/Users/regeorge/Documents/codeStore/stickergotaro"
-VENV="$ROOT/.venv-xiaogpt-local"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+VENV="${XIAOGPT_VENV:-$ROOT/.venv-xiaogpt-local}"
 
 cd "$ROOT"
 
@@ -28,6 +28,6 @@ cd "$ROOT"
   --raw-dir data/raw \
   --output data/source_history.md
 
-zsh scripts/capture_report_screenshots.sh || true
+bash scripts/capture_report_screenshots.sh || true
 
 "$VENV/bin/python" scripts/sync_sqlite.py

@@ -12,6 +12,20 @@ Primary data outputs:
 - `data/moments_logs.json`
 - `data/reports/*.json|*.md|*.txt`
 
+## 0. Host setup model
+
+The code is no longer tied to one Mac path. The repo now supports this deployment shape:
+
+- clone the repo on the target machine
+- create `.venv-xiaogpt-local`
+- copy only private machine-specific files such as `runtime/xiaogpt/config.yaml` and `.env.local`
+- run the repo scripts directly, or install Linux `systemd --user` units from the repo
+
+Private config lookup order:
+
+- `runtime/xiaogpt/config.yaml`
+- `~/.xiaogpt/config.yaml`
+
 ## 1. Start the local listener
 
 The listener reads XiaoAi conversations, decides whether a turn should go through the configured LLM, and appends each turn to a daily Markdown file.
@@ -99,7 +113,7 @@ Nightly script:
 .venv-xiaogpt-local/bin/python scripts/run_nightly_pipeline.py
 ```
 
-Included `launchd` job:
+Included macOS `launchd` job:
 
 - `launchd/com.regeorge.stickergotaro.xiaoman-nightly.plist`
 
@@ -120,10 +134,10 @@ This will run every day at `23:00`.
 Listener runner:
 
 ```bash
-zsh scripts/run_listener_service.sh
+bash scripts/run_listener_service.sh
 ```
 
-Included `launchd` listener job:
+Included macOS `launchd` listener job:
 
 - `launchd/com.regeorge.stickergotaro.listener.plist`
 
@@ -139,7 +153,35 @@ launchctl load ~/Library/LaunchAgents/com.regeorge.stickergotaro.listener.plist
 
 This listener starts at login and is kept alive by `launchd`.
 
-## 6. Local backend and Web UI
+## 6. Linux user service with systemd
+
+Install the repo-managed user units:
+
+```bash
+bash scripts/install_systemd_user_units.sh
+```
+
+This installs:
+
+- `stickergotaro-xiaogpt-listener.service`
+- `stickergotaro-xiaoman-nightly.service`
+- `stickergotaro-xiaoman-nightly.timer`
+
+The generated units point back to the current clone path, so a Linux machine only needs:
+
+- the checked-out repo
+- `runtime/xiaogpt/config.yaml`
+- `.env.local` if LLM keys are needed
+
+Useful commands:
+
+```bash
+systemctl --user status stickergotaro-xiaogpt-listener.service
+systemctl --user status stickergotaro-xiaoman-nightly.timer
+journalctl --user -u stickergotaro-xiaogpt-listener.service -f
+```
+
+## 7. Local backend and Web UI
 
 Minimal local backend:
 
@@ -210,7 +252,7 @@ Included `launchd` Web UI job:
 
 - `launchd/com.regeorge.stickergotaro.webui.plist`
 
-## 7. Script vs LLM split
+## 8. Script vs LLM split
 
 Use scripts for:
 

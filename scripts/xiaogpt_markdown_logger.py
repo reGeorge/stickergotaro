@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import asyncio
+import os
 import re
 from dataclasses import dataclass
 from datetime import datetime
@@ -14,14 +15,33 @@ from xiaogpt.config import Config, WAKEUP_KEYWORD
 from xiaogpt.xiaogpt import MiGPT
 
 
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def default_config_path() -> Path:
+    candidates = [
+        Path(
+            os.environ.get(
+                "XIAOGPT_CONFIG_PATH",
+                ROOT / "runtime" / "xiaogpt" / "config.yaml",
+            )
+        ),
+        Path.home() / ".xiaogpt" / "config.yaml",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Listen to XiaoAi conversations locally and append them to daily Markdown files."
     )
     parser.add_argument(
         "--config-path",
-        default=str(Path.home() / ".xiaogpt" / "config.yaml"),
-        help="Path to the existing xiaogpt YAML config.",
+        default=str(default_config_path()),
+        help="Path to the xiaogpt YAML config. Defaults to runtime/xiaogpt/config.yaml, then ~/.xiaogpt/config.yaml.",
     )
     parser.add_argument("--hardware", default="L05B", help="Target XiaoAi hardware.")
     parser.add_argument("--mi-did", default="2116704058", help="Target XiaoAi mi_did.")
@@ -47,7 +67,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--env-file",
-        default=".env.local",
+        default=os.environ.get("XIAOGPT_ENV_FILE", str(ROOT / ".env.local")),
         help="Optional dotenv file that contains LLM API keys.",
     )
     parser.add_argument(

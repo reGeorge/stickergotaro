@@ -1,6 +1,10 @@
 # Local Architecture
 
 这套系统目前更适合采用“宿主机采集 + 本地服务展示 + 定时整理”的结构。
+脚本层现在已经是跨平台的，但服务托管层分成：
+
+- macOS: `launchd`
+- Linux: `systemd --user`
 
 ## 推荐架构
 
@@ -17,9 +21,9 @@
                      └──────────────┬───────────────┘
                                     │
                                     ▼
-          宿主机 macOS              ┌──────────────────────────────┐
+          宿主机 macOS / Linux      ┌──────────────────────────────┐
    ┌───────────────────────────────▶│ xiaogpt listener            │
-   │                                │ launchd 常驻                │
+   │                                │ launchd / systemd --user    │
    │                                │ scripts/xiaogpt_markdown_   │
    │                                │ logger.py --record-only     │
    │                                └──────────────┬───────────────┘
@@ -33,7 +37,7 @@
    │                           每天 23:00          ▼
    │                                ┌──────────────────────────────┐
    │                                │ nightly pipeline             │
-   │                                │ launchd 定时                 │
+   │                                │ launchd / systemd timer      │
    │                                │ extract + build logs         │
    │                                └──────────────┬───────────────┘
    │                                               │
@@ -68,7 +72,9 @@
 
 - 负责连接本机的小爱账号环境
 - 负责持续监听并记录原始对话
-- 最适合用 `launchd`
+- 最适合交给宿主机服务管理器
+- macOS 推荐 `launchd`
+- Linux 推荐 `systemd --user`
 
 ### 2. 原始数据层
 
@@ -100,8 +106,8 @@
 
 当前更推荐：
 
-- 监听器：宿主机 `launchd`
-- nightly：宿主机 `launchd`
+- 监听器：宿主机服务管理器
+- nightly：宿主机服务管理器
 - 本地后端 / Web UI：先宿主机，后续可迁到 Docker
 - 数据库：如果将来引入正式数据库，这一层最适合 Docker
 

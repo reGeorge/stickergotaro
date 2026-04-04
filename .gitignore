@@ -16,6 +16,8 @@ data/
 *.local
 __pycache__/
 *.pyc
+runtime/xiaogpt/config.yaml
+systemd/generated/
 
 # Editor directories and files
 .vscode/*

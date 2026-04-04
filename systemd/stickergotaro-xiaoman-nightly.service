@@ -1,0 +1,10 @@
+[Unit]
+Description=Stickergotaro nightly XiaoMan pipeline
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=__ROOT__
+Environment=XIAOGPT_VENV=__ROOT__/.venv-xiaogpt-local
+ExecStart=/usr/bin/env bash __ROOT__/scripts/run_nightly_pipeline.sh

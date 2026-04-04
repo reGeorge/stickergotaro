@@ -1,0 +1,6 @@
+account: your_xiaomi_account
+password: your_xiaomi_password
+
+# Optional values can stay in the service env or CLI arguments.
+# hardware: L05B
+# mi_did: "2116704058"

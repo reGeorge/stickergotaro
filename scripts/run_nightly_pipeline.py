@@ -4,8 +4,10 @@ import sys
 from pathlib import Path
 
 
-ROOT = Path("/Users/regeorge/Documents/codeStore/stickergotaro")
-PYTHON = ROOT / ".venv-xiaogpt-local" / "bin" / "python"
+ROOT = Path(__file__).resolve().parent.parent
+PYTHON = Path(
+    sys.executable if Path(sys.executable).resolve().parent.name == "bin" else ROOT / ".venv-xiaogpt-local" / "bin" / "python"
+)
 
 
 def run(*args: str, allow_failure: bool = False) -> None:

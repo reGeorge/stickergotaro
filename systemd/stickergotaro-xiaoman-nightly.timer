@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Stickergotaro nightly XiaoMan pipeline daily
+
+[Timer]
+OnCalendar=*-*-* 23:00:00
+Persistent=true
+Unit=stickergotaro-xiaoman-nightly.service
+
+[Install]
+WantedBy=timers.target

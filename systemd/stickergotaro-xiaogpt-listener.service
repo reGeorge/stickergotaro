@@ -1,0 +1,17 @@
+[Unit]
+Description=Stickergotaro XiaoGPT listener
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=__ROOT__
+Environment=XIAOGPT_CONFIG_PATH=__ROOT__/runtime/xiaogpt/config.yaml
+Environment=XIAOGPT_ENV_FILE=__ROOT__/.env.local
+Environment=XIAOGPT_VENV=__ROOT__/.venv-xiaogpt-local
+ExecStart=/usr/bin/env bash __ROOT__/scripts/run_listener_service.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 import json
+import os
 from pathlib import Path
 
 import yaml
@@ -10,14 +11,33 @@ from xiaogpt.config import Config, LATEST_ASK_API
 from xiaogpt.xiaogpt import MiGPT
 
 
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def default_config_path() -> Path:
+    candidates = [
+        Path(
+            os.environ.get(
+                "XIAOGPT_CONFIG_PATH",
+                ROOT / "runtime" / "xiaogpt" / "config.yaml",
+            )
+        ),
+        Path.home() / ".xiaogpt" / "config.yaml",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Check whether the local xiaogpt environment can read recent XiaoAi conversations."
     )
     parser.add_argument(
         "--config-path",
-        default=str(Path.home() / ".xiaogpt" / "config.yaml"),
-        help="Path to the existing xiaogpt YAML config.",
+        default=str(default_config_path()),
+        help="Path to the xiaogpt YAML config. Defaults to runtime/xiaogpt/config.yaml, then ~/.xiaogpt/config.yaml.",
     )
     parser.add_argument(
         "--hardware",
