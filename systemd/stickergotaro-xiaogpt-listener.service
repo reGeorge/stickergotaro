@@ -7,6 +7,7 @@ Wants=network-online.target
 Type=simple
 WorkingDirectory=__ROOT__
 Environment=XIAOGPT_CONFIG_PATH=__ROOT__/runtime/xiaogpt/config.yaml
+Environment=XIAOGPT_TOKEN_PATH=__ROOT__/runtime/xiaogpt/.mi.token
 Environment=XIAOGPT_ENV_FILE=__ROOT__/.env.local
 Environment=XIAOGPT_VENV=__ROOT__/.venv-xiaogpt-local
 ExecStart=/usr/bin/env bash __ROOT__/scripts/run_listener_service.sh

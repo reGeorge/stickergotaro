@@ -34,6 +34,22 @@ def default_config_path() -> Path:
     return candidates[0]
 
 
+def default_token_path() -> Path:
+    candidates = [
+        Path(
+            os.environ.get(
+                "XIAOGPT_TOKEN_PATH",
+                ROOT / "runtime" / "xiaogpt" / ".mi.token",
+            )
+        ),
+        Path.home() / ".mi.token",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Listen to XiaoAi conversations locally and append them to daily Markdown files."
@@ -69,6 +85,11 @@ def parse_args() -> argparse.Namespace:
         "--env-file",
         default=os.environ.get("XIAOGPT_ENV_FILE", str(ROOT / ".env.local")),
         help="Optional dotenv file that contains LLM API keys.",
+    )
+    parser.add_argument(
+        "--token-path",
+        default=str(default_token_path()),
+        help="Path to the Xiaomi token cache. Defaults to runtime/xiaogpt/.mi.token, then ~/.mi.token.",
     )
     parser.add_argument(
         "--keyword",
@@ -165,11 +186,13 @@ class LoggedMiGPT(MiGPT):
         journal: MarkdownJournal,
         speak_answers: bool,
         record_only: bool,
+        token_path: Path,
     ):
         super().__init__(config)
         self.journal = journal
         self.speak_answers = speak_answers
         self.record_only = record_only
+        self.mi_token_home = token_path
 
     async def _single_text_stream(self, text: str) -> AsyncIterator[str]:
         yield text
@@ -329,6 +352,7 @@ async def main() -> None:
         journal,
         speak_answers=args.speak,
         record_only=args.record_only,
+        token_path=Path(args.token_path),
     )
     try:
         await listener.run_logged_forever()

@@ -17,6 +17,7 @@ data/
 __pycache__/
 *.pyc
 runtime/xiaogpt/config.yaml
+runtime/xiaogpt/.mi.token
 systemd/generated/
 
 # Editor directories and files

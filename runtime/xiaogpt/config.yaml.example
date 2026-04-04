@@ -4,3 +4,6 @@ password: your_xiaomi_password
 # Optional values can stay in the service env or CLI arguments.
 # hardware: L05B
 # mi_did: "2116704058"
+#
+# If the account relies on cached Xiaomi login state, also copy
+# ~/.mi.token to runtime/xiaogpt/.mi.token on the target machine.

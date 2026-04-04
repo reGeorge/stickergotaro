@@ -22,12 +22,24 @@ cp runtime/xiaogpt/config.yaml.example runtime/xiaogpt/config.yaml
 
 Then edit `runtime/xiaogpt/config.yaml` with the Xiaomi account credentials that should not be committed.
 
+If the source machine already has a working Xiaomi login cache, copy that too:
+
+```bash
+cp ~/.mi.token runtime/xiaogpt/.mi.token
+```
+
 Fallback behavior:
 
 - first: `runtime/xiaogpt/config.yaml`
 - then: `~/.xiaogpt/config.yaml`
 
+Token cache lookup order:
+
+- first: `runtime/xiaogpt/.mi.token`
+- then: `~/.mi.token`
+
 You can still override the path explicitly with `XIAOGPT_CONFIG_PATH=/path/to/config.yaml`.
+You can still override the token path explicitly with `XIAOGPT_TOKEN_PATH=/path/to/.mi.token`.
 
 ## Verify recent XiaoAi conversations
 
@@ -49,4 +61,5 @@ Optional full JSON output:
 - The verified `hardware` is `L05B`.
 - The verified `mi_did` is `2116704058`.
 - `runtime/xiaogpt/config.yaml` is gitignored so Linux or macOS machines can each copy in their own private credentials after cloning.
+- `runtime/xiaogpt/.mi.token` is also gitignored and is preferred over `~/.mi.token` when present.
 - Keeping Xiaomi credentials in plain YAML is still risky. If this grows beyond a personal setup, move them to a safer secret store.

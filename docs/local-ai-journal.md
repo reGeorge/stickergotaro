@@ -18,13 +18,18 @@ The code is no longer tied to one Mac path. The repo now supports this deploymen
 
 - clone the repo on the target machine
 - create `.venv-xiaogpt-local`
-- copy only private machine-specific files such as `runtime/xiaogpt/config.yaml` and `.env.local`
+- copy only private machine-specific files such as `runtime/xiaogpt/config.yaml`, `runtime/xiaogpt/.mi.token`, and `.env.local`
 - run the repo scripts directly, or install Linux `systemd --user` units from the repo
 
 Private config lookup order:
 
 - `runtime/xiaogpt/config.yaml`
 - `~/.xiaogpt/config.yaml`
+
+Xiaomi token cache lookup order:
+
+- `runtime/xiaogpt/.mi.token`
+- `~/.mi.token`
 
 ## 1. Start the local listener
 
@@ -171,6 +176,7 @@ The generated units point back to the current clone path, so a Linux machine onl
 
 - the checked-out repo
 - `runtime/xiaogpt/config.yaml`
+- `runtime/xiaogpt/.mi.token` if the account depends on cached Xiaomi login state
 - `.env.local` if LLM keys are needed
 
 Useful commands:

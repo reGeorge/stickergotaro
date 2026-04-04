@@ -30,6 +30,22 @@ def default_config_path() -> Path:
     return candidates[0]
 
 
+def default_token_path() -> Path:
+    candidates = [
+        Path(
+            os.environ.get(
+                "XIAOGPT_TOKEN_PATH",
+                ROOT / "runtime" / "xiaogpt" / ".mi.token",
+            )
+        ),
+        Path.home() / ".mi.token",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Check whether the local xiaogpt environment can read recent XiaoAi conversations."
@@ -56,6 +72,11 @@ def parse_args() -> argparse.Namespace:
         help="How many recent records to print.",
     )
     parser.add_argument(
+        "--token-path",
+        default=str(default_token_path()),
+        help="Path to the Xiaomi token cache. Defaults to runtime/xiaogpt/.mi.token, then ~/.mi.token.",
+    )
+    parser.add_argument(
         "--verbose-json",
         action="store_true",
         help="Print the full raw records JSON.",
@@ -76,6 +97,7 @@ async def main() -> None:
     )
 
     miboy = MiGPT(config)
+    miboy.mi_token_home = Path(args.token_path)
     try:
         await miboy.init_all_data()
         url = LATEST_ASK_API.format(hardware=config.hardware, timestamp="0")
